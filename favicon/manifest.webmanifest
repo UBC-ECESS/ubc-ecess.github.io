@@ -1,7 +1,7 @@
 {
-  "name": "UBC Club MECH",
-  "short_name": "UBC Club MECH",
-  "description": "UBC Mechanical Engineering Undergraduate Student Club",
+  "name": "UBC ECESS",
+  "short_name": "UBC ECESS",
+  "description": "UBC Electrical and Computer Engineering Student Society",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
