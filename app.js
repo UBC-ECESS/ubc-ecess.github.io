@@ -201,7 +201,11 @@ const RELOAD_TIME = 400; // ms
 const body = document.querySelector("body");
 let fetchedSheets = new Set();
 
-function injectHeader() {
+/*
+ * Builds the site navigation header and prepends it to the HTML body.
+ * Contains the logo, a toggle button, nav links, (optional) social links, and a hamburger button to toggle the navigation.
+ */
+function injectNavHeader() {
   const header = document.createElement("header");
   header.innerHTML = `
     <div class="logo desktop">
@@ -217,6 +221,9 @@ function injectHeader() {
   header.querySelector("#open-nav").addEventListener("click", toggleNav);
 }
 
+/*
+ * Appends shared meta tags to document head that are identical across all pages.
+ */
 function injectMetaTags() {
   const description = document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
   const metas = [
@@ -239,7 +246,7 @@ function injectMetaTags() {
 async function init() {
   let page = body.getAttribute("id");
   injectMetaTags();
-  if (page !== "leaderboard-page") injectHeader();
+  if (page !== "leaderboard-page") injectNavHeader(); // Leaderboard Page Excluded
   document.querySelectorAll('input[name="from_name"]').forEach((el) => {
     el.value = CONFIG.formFromName;
   });
