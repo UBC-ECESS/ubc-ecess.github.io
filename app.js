@@ -139,6 +139,27 @@ const SHEETS = {
   },
 };
 
+// SITE CONFIG — change these to rebrand
+const CONFIG = {
+  siteNameFull: "UBC ECESS",
+  author: "UBC ECESS",
+  formFromName: "UBC ECESS Website",
+  ogImage: "https://ubcclubmech.ca/media/logos/mech-og.jpg",
+  ogImageAlt: "UBC ECESS logo",
+  ogImageType: "image/jpeg",
+};
+
+const NAV_LINKS = [
+  { label: "Home", href: "." },
+  { label: "Events", href: "./events" },
+  { label: "Council", href: "./council" },
+  { label: "Sponsors", href: "./sponsors" },
+  { label: "Contact", href: "./contact" },
+  { label: "Merch", href: "./merch" },
+  { label: "Lockers", href: "./lockers" },
+  { label: "Leaderboard", href: "./leaderboard" },
+];
+
 let data = {};
 fixNullData();
 
@@ -180,8 +201,48 @@ const RELOAD_TIME = 400; // ms
 const body = document.querySelector("body");
 let fetchedSheets = new Set();
 
+function injectHeader() {
+  const header = document.createElement("header");
+  header.innerHTML = `
+    <div class="logo desktop">
+      <img src="media/logos/white.png">
+    </div>
+    <button class="button icon square" id="open-nav"><i class="fa-solid fa-bars"></i></button>
+    <nav id="nav" class="hidden">
+      ${NAV_LINKS.map(({ label, href }) => `<a class="button nav" href="${href}">${label}</a>`).join("\n      ")}
+    </nav>
+    <div id="socials"></div>
+  `;
+  body.insertBefore(header, body.firstChild);
+  header.querySelector("#open-nav").addEventListener("click", toggleNav);
+}
+
+function injectMetaTags() {
+  const description = document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
+  const metas = [
+    { name: "author", content: CONFIG.author },
+    { property: "og:title", content: document.title },
+    { property: "og:site_name", content: CONFIG.siteNameFull },
+    { property: "og:type", content: "website" },
+    { property: "og:description", content: description },
+    { property: "og:image", content: CONFIG.ogImage },
+    { property: "og:image:alt", content: CONFIG.ogImageAlt },
+    { property: "og:image:type", content: CONFIG.ogImageType },
+  ];
+  for (const attrs of metas) {
+    const meta = document.createElement("meta");
+    for (const [key, value] of Object.entries(attrs)) meta.setAttribute(key, value);
+    document.head.appendChild(meta);
+  }
+}
+
 async function init() {
   let page = body.getAttribute("id");
+  injectMetaTags();
+  if (page !== "leaderboard-page") injectHeader();
+  document.querySelectorAll('input[name="from_name"]').forEach((el) => {
+    el.value = CONFIG.formFromName;
+  });
   switch (page) {
     case "home-page":
       fetchSheet("socials", makeSocials);
@@ -510,9 +571,7 @@ function toggleNav() {
     nav.classList.add("hidden");
   }
 }
-document.querySelectorAll("#open-nav").forEach((el) => {
-  el.addEventListener("click", toggleNav);
-});
+
 
 function setNavDelays(reverse = false) {
   let buttons = document.querySelectorAll("header nav .button.nav");
@@ -990,7 +1049,7 @@ function makeEvents(num) {
             }
           }
         }
-        href += `?subject=Club MECH ${getCell("events", currEvent, "name")}`;
+        href += `?subject=${CONFIG.siteNameFull} ${getCell("events", currEvent, "name")}`;
 
         html += `<li><a class="button link" href="${href}" target="_blank"><i class="fa-solid fa-envelope"></i>Contact Organizers</a></li>`;
       }
