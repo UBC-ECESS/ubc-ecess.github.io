@@ -686,7 +686,7 @@ header nav .button.nav:hover {
 	align-items: center;
 }
 
-.section-header img {
+.section-header > img {
 	z-index: 0;
 	position: fixed;
 	width: max(110%, 800px);
@@ -721,6 +721,12 @@ header nav .button.nav:hover {
 	margin: 0px;
 	color: var(--section);
 	text-shadow: var(--section-shadow);
+}
+
+#hero-logo {
+	height: min(260px, 42vw);
+	width: auto;
+	filter: drop-shadow(0 0 0.5em hsl(0, 0%, 0%, 80%));
 }
 
 /* .section-header h1:not(:last-child) {
