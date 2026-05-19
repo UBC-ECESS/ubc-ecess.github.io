@@ -1,6 +1,6 @@
 const QUERY = encodeURIComponent("Select *");
 
-const DATABASE_DOC = "15aAzBnPpvBR3ntpgvbLN9WE5ftH6mSTPElIBsFxefk0";
+const DATABASE_DOC = "17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A";
 const GAMES_LOG_DOC = "1r8BtslMkYsPrT3gRfWNOGKM8-QjrsfuN8ts8N5JqZXQ";
 
 // ! UPDATE THESE IF COLUMNS ARE REORDERED, SHEET TAB IS RENAMED, OR IS MOVED TO ANOTHER DOC
@@ -139,14 +139,14 @@ const SHEETS = {
   },
 };
 
-// SITE CONFIG — change these to rebrand
+// SITE CONFIGs
 const CONFIG = {
   siteNameFull: "UBC ECESS",
   author: "UBC ECESS",
   formFromName: "UBC ECESS Website",
-  ogImage: "https://ubcclubmech.ca/media/logos/mech-og.jpg",
+  ogImage: "https://ubc-ecess.github.io/media/logos/ece-og.png", // ToDo: Update to New Domain
   ogImageAlt: "UBC ECESS logo",
-  ogImageType: "image/jpeg",
+  ogImageType: "image/png",
 };
 
 const NAV_LINKS = [
@@ -209,7 +209,7 @@ function injectNavHeader() {
   const header = document.createElement("header");
   header.innerHTML = `
     <div class="logo desktop">
-      <img src="media/logos/white.png">
+      <img src="media/logos/ece-white.png">
     </div>
     <button class="button icon square" id="open-nav"><i class="fa-solid fa-bars"></i></button>
     <nav id="nav" class="hidden">
