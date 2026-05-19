@@ -1,7 +1,7 @@
 const QUERY = encodeURIComponent("Select *");
 
-const DATABASE_DOC = "15aAzBnPpvBR3ntpgvbLN9WE5ftH6mSTPElIBsFxefk0";
-const GAMES_LOG_DOC = "1r8BtslMkYsPrT3gRfWNOGKM8-QjrsfuN8ts8N5JqZXQ";
+const DATABASE_DOC = "17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A";
+const GAMES_LOG_DOC = "1u-wBWNxd7jEW2euJwzaiinHMNy8S_QvJgzh0G9xjU98";
 
 // ! UPDATE THESE IF COLUMNS ARE REORDERED, SHEET TAB IS RENAMED, OR IS MOVED TO ANOTHER DOC
 const SHEETS = {
@@ -139,6 +139,27 @@ const SHEETS = {
   },
 };
 
+// SITE CONFIGs
+const CONFIG = {
+  siteNameFull: "UBC ECESS",
+  author: "UBC ECESS",
+  formFromName: "UBC ECESS Website",
+  ogImage: "https://ubc-ecess.github.io/media/logos/ece-og.png", // ToDo: Update to New Domain
+  ogImageAlt: "UBC ECESS logo",
+  ogImageType: "image/png",
+};
+
+const NAV_LINKS = [
+  { label: "Home", href: "." },
+  { label: "Events", href: "./events" },
+  { label: "Council", href: "./council" },
+  { label: "Sponsors", href: "./sponsors" },
+  { label: "Contact", href: "./contact" },
+  { label: "Merch", href: "./merch" },
+  { label: "Lockers", href: "./lockers" },
+  { label: "Leaderboard", href: "./leaderboard" },
+];
+
 let data = {};
 fixNullData();
 
@@ -180,8 +201,55 @@ const RELOAD_TIME = 400; // ms
 const body = document.querySelector("body");
 let fetchedSheets = new Set();
 
+/*
+ * Builds the site navigation header and prepends it to the HTML body.
+ * Contains the logo, a toggle button, nav links, (optional) social links, and a hamburger button to toggle the navigation.
+ */
+function injectNavHeader() {
+  const header = document.createElement("header");
+  header.innerHTML = `
+    <div class="logo desktop">
+      <img src="media/logos/ece-white.png">
+    </div>
+    <button class="button icon square" id="open-nav"><i class="fa-solid fa-bars"></i></button>
+    <nav id="nav" class="hidden">
+      ${NAV_LINKS.map(({ label, href }) => `<a class="button nav" href="${href}">${label}</a>`).join("\n      ")}
+    </nav>
+    <div id="socials"></div>
+  `;
+  body.insertBefore(header, body.firstChild);
+  header.querySelector("#open-nav").addEventListener("click", toggleNav);
+}
+
+/*
+ * Appends shared meta tags to document head that are identical across all pages.
+ */
+function injectMetaTags() {
+  const description = document.querySelector('meta[name="description"]')?.getAttribute("content") ?? "";
+  const metas = [
+    { name: "author", content: CONFIG.author },
+    { property: "og:title", content: document.title },
+    { property: "og:site_name", content: CONFIG.siteNameFull },
+    { property: "og:type", content: "website" },
+    { property: "og:description", content: description },
+    { property: "og:image", content: CONFIG.ogImage },
+    { property: "og:image:alt", content: CONFIG.ogImageAlt },
+    { property: "og:image:type", content: CONFIG.ogImageType },
+  ];
+  for (const attrs of metas) {
+    const meta = document.createElement("meta");
+    for (const [key, value] of Object.entries(attrs)) meta.setAttribute(key, value);
+    document.head.appendChild(meta);
+  }
+}
+
 async function init() {
   let page = body.getAttribute("id");
+  injectMetaTags();
+  if (page !== "leaderboard-page") injectNavHeader(); // Leaderboard Page Excluded
+  document.querySelectorAll('input[name="from_name"]').forEach((el) => {
+    el.value = CONFIG.formFromName;
+  });
   switch (page) {
     case "home-page":
       fetchSheet("socials", makeSocials);
@@ -510,9 +578,7 @@ function toggleNav() {
     nav.classList.add("hidden");
   }
 }
-document.querySelectorAll("#open-nav").forEach((el) => {
-  el.addEventListener("click", toggleNav);
-});
+
 
 function setNavDelays(reverse = false) {
   let buttons = document.querySelectorAll("header nav .button.nav");
@@ -990,7 +1056,7 @@ function makeEvents(num) {
             }
           }
         }
-        href += `?subject=Club MECH ${getCell("events", currEvent, "name")}`;
+        href += `?subject=${CONFIG.siteNameFull} ${getCell("events", currEvent, "name")}`;
 
         html += `<li><a class="button link" href="${href}" target="_blank"><i class="fa-solid fa-envelope"></i>Contact Organizers</a></li>`;
       }
