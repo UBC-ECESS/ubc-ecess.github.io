@@ -72,6 +72,11 @@ const SHEETS = {
     DOC: DATABASE_DOC,
     COLS: ["name", "link", "logo", "tier", "show"],
   },
+  courses: {
+    SHEET: "Courses",
+    DOC: DATABASE_DOC,
+    COLS: ["code", "name", "year", "link", "show"],
+  },
   lockers: {
     SHEET: "Lockers",
     DOC: DATABASE_DOC,
@@ -153,6 +158,7 @@ const NAV_LINKS = [
   { label: "Home", href: "." },
   { label: "Events", href: "./events" },
   { label: "Council", href: "./council" },
+  { label: "Courses", href: "./courses" },
   { label: "Sponsors", href: "./sponsors" },
   { label: "Contact", href: "./contact" },
   { label: "Merch", href: "./merch" },
@@ -288,6 +294,10 @@ async function init() {
         makeMerchCategories();
         makeMerch();
       });
+      break;
+    case "courses-page":
+      fetchSheet("socials", makeSocials);
+      fetchSheet("courses", makeCourses);
       break;
     case "lockers-page":
       fetchSheet("socials", makeSocials);
@@ -858,7 +868,7 @@ function makeSponsors() {
       break;
     }
   }
-  document.getElementById("form-key").setAttribute("value", key);
+  document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
 
   let html = "";
   let tiers = ["Titanium", "Steel", "Iron", "Aluminum"];
@@ -1322,6 +1332,103 @@ document.querySelectorAll("#merch-categories").forEach((el) => {
   el.addEventListener("input", filterMerch);
 });
 
+// COURSES
+
+function makeCourses() {
+  let yearsSet = new Set();
+  for (let i = 0; i < data.courses.length; i++) { // Iterate Through Courses to Get Unique Years for Filtering
+    if (
+      anyCellNull("courses", i, ["code", "name", "year"]) ||
+      getCell("courses", i, "show") == false
+    ) { // Skip Blank/Hidden Entries
+      continue;
+    }
+    yearsSet.add(getCell("courses", i, "year")); // Add Year to Set
+  }
+
+  let years = Array.from(yearsSet).sort();
+  let yearHTML = `<li><button class="button selected" id="course-year-all-button">All</button></li>`;
+
+  for (let y of years) { // Create Button for Each Unique Year
+    yearHTML += `<li><button class="button" id="course-year-${y}-button">${y}-Level</button></li>`;
+  }
+  document.getElementById("course-years").innerHTML = yearHTML; // Insert Year Buttons into DOM
+
+  // Add Event Listeners to Year Buttons for Filtering
+  document.querySelectorAll("#course-years button").forEach((el) => {
+    el.addEventListener("click", () => {
+      document.querySelectorAll("#course-years button").forEach((b) =>
+        b.classList.remove("selected"), // Remove Highlight from All Buttons
+      );
+      el.classList.add("selected"); // Highlight Selected Button
+
+      let id = el.getAttribute("id"); // Extract Year from Button ID
+      let yearStr = id.replace("course-year-", "").replace("-button", ""); // Get Year String
+
+      filterCourses(yearStr === "all" ? null : Number(yearStr)); // Filter Courses by Year
+    });
+  });
+
+  let html = "";
+  let idx = 0;
+
+  for (let i = 0; i < data.courses.length; i++) { // Iterate Through Courses to Generate HTML
+    if (
+      anyCellNull("courses", i, ["code", "name", "year"]) ||
+      getCell("courses", i, "show") == false
+    ) { // Skip Blank/Hidden Entries
+      continue;
+    }
+
+    let code = getCell("courses", i, "code");
+    let name = getCell("courses", i, "name");
+    let year = getCell("courses", i, "year");
+    let link = getCell("courses", i, "link");
+
+    // Create Course Item HTML with Year-Based Class for Filtering and Animation Delay for Staggered Appearance
+    html += `<li class="course-item year-${year}" style="animation-delay: ${idx * POP_IN_DELAY}ms;">`;
+    html += `<div class="year-badge">${year}-Level</div>`;
+    html += `<h2>${code}</h2>`;
+    html += `<h3>${name}</h3>`;
+    if (link != null) { // If Course Link Exists, Add Button to Course Website
+      html += `<a class="button link" href="${link}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i>Course Website</a>`;
+    }
+    html += "</li>";
+    idx++;
+  }
+
+  if (idx === 0) { // If No Courses to Display, Show Placeholder Message
+    html = `<li><div class="no-entries">No courses listed yet. Check back soon!</div></li>`;
+  }
+
+  document.getElementById("courses-grid").innerHTML = html;
+  addButtonEvents();
+}
+
+function filterCourses(year) {
+  let courseItems = document.querySelectorAll(".course-item");
+  let coursesGrid = document.querySelector("#courses-grid");
+
+  // Set Grid Min-Height to Prevent Layout Shift During Filtering
+  coursesGrid.style = `min-height: ${coursesGrid.getBoundingClientRect().height}px`;
+  setTimeout(() => {
+    coursesGrid.style = "";
+  }, 1);
+
+  // Iterate Through Course Items and Show/Hide Based on Year
+  for (let i = 0; i < courseItems.length; i++) {
+    courseItems[i].style = "";
+    courseItems[i].style.display = "none";
+    setTimeout(() => {
+      // If Course Year Matches / "All" is Selected
+      if (year == null || courseItems[i].classList.contains(`year-${year}`)) {
+        courseItems[i].style = `animation-delay: ${i * POP_IN_DELAY}ms;`; // Staggered Animation
+        courseItems[i].style.display = ""; // Show Item
+      }
+    }, 1);
+  }
+}
+
 // LOCKERS
 
 function makeLockers() {
@@ -1442,7 +1549,7 @@ function makeContactOptions() {
     }
   }
 
-  document.getElementById("form-key").setAttribute("value", key);
+  document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
   document
     .getElementById("form-subject")
     .setAttribute(
@@ -1488,7 +1595,7 @@ function updateContactForm() {
   }
   let subject = `Website Contact Message (${type})`;
 
-  document.getElementById("form-key").setAttribute("value", key);
+  document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
   document.getElementById("form-subject").setAttribute("value", subject);
 }
 document.querySelectorAll("#form-type").forEach((el) => {
