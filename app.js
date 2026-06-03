@@ -1363,9 +1363,9 @@ function makeCourses() {
       el.classList.add("selected"); // Highlight Selected Button
 
       let id = el.getAttribute("id"); // Extract Year from Button ID
-      let yearStr = id.replace("course-year-", "").replace("-button", ""); // Get Year String (e.g., "all", "100", "200", etc.)
+      let yearStr = id.replace("course-year-", "").replace("-button", ""); // Get Year String
 
-      filterCourses(yearStr === "all" ? null : Number(yearStr)); // Filter Courses by Year (null for "All", Number for Specific Year)
+      filterCourses(yearStr === "all" ? null : Number(yearStr)); // Filter Courses by Year
     });
   });
 
