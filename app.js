@@ -1390,15 +1390,17 @@ function makeCourses() {
     html += `<div class="year-badge">${year}-Level</div>`;
     html += `<h2>${code}</h2>`;
     html += `<h3>${name}</h3>`;
-    if (link != null) { // If Course Link Exists, Add Button to Course Website
-      html += `<a class="button link" href="${link}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i>Course Website</a>`;
+    if (link != null && (link.includes("playlist") || link.includes("youtube"))) { // If Course Link Exists and is Course Playlist, Link to Video Playlist
+      html += `<a class="button link" href="${link}" target="_blank"><i class="fa-solid fa-video"></i>Video Playlist</a>`;
+    } else if (link != null) { // If Course Link Exists and is Not Playlist, Link to Course Website
+      html += `<a class="button link" href="${link}" target="_blank"><i class="fa-solid fa-link"></i>Course Website</a>`;
     }
     html += "</li>";
     idx++;
   }
 
   if (idx === 0) { // If No Courses to Display, Show Placeholder Message
-    html = `<li><div class="no-entries">No courses listed yet. Check back soon!</div></li>`;
+    html = `<li><div class="no-entries">No courses listed yet...Check back soon!</div></li>`;
   }
 
   document.getElementById("courses-grid").innerHTML = html;
