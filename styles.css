@@ -143,12 +143,12 @@
 	--third-glow: hsl(40, 60%, calc(50% + 43% / 2), 100%);
 
 	/* course year colours */
-	--course-200-h: hsl(210, 65%, 28%);
-	--course-200-bg: hsl(210, 70%, 90%);
-	--course-300-h: hsl(20, 65%, 30%);
-	--course-300-bg: hsl(20, 75%, 90%);
-	--course-400-h: hsl(140, 50%, 22%);
-	--course-400-bg: hsl(140, 55%, 88%);
+	--course-200-h: hsl(170, 55%, 22%);
+	--course-200-bg: hsl(170, 60%, 88%);
+	--course-300-h: hsl(210, 65%, 28%);
+	--course-300-bg: hsl(210, 70%, 90%);
+	--course-400-h: hsl(250, 50%, 28%);
+	--course-400-bg: hsl(250, 55%, 90%);
 }
 
 /* } */
