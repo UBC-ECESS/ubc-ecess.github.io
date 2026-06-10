@@ -20,13 +20,13 @@ function parseYear(code) {
 }
 
 /*
- * Icon and label for each resource type
+ * Icon and Label Metadata for Resource Types
  */
 const RESOURCE_TYPE_META = {
   "Video Playlist": { icon: "video", label: "Video Playlist" },
   "Syllabus": { icon: "file-lines", label: "Syllabus" },
   "Notes": { icon: "note-sticky", label: "Notes" },
-  "Practice Midterm": { icon: "pencil", label: "Practice Midterm" },
+  "Practice": { icon: "pencil", label: "Practice" },
   "Website": { icon: "link", label: "Course Website" },
 };
 
