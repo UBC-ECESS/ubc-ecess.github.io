@@ -1912,6 +1912,47 @@ form .button {
 	padding: var(--thin-padding);
 }
 
+.course-item details.course-resources {
+	margin-top: 0.5rem;
+	width: 100%;
+}
+
+.course-item details.course-resources summary {
+	list-style: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+}
+
+.course-item details.course-resources summary::-webkit-details-marker {
+	display: none;
+}
+
+.course-item details.course-resources summary .chevron {
+	font-size: 0.7em;
+	transition: transform 0.2s ease;
+	margin-left: 0.1em;
+}
+
+.course-item details.course-resources[open] summary .chevron {
+	transform: rotate(180deg);
+}
+
+.course-item details.course-resources .course-resources-list {
+	padding: 0.5rem 0 0 0;
+	margin: 0;
+}
+
+.course-item details.course-resources .course-resources-list > div {
+	margin-top: 0.5rem;
+}
+
+.course-item details.course-resources .course-resources-list > div > .button.link {
+	display: block;
+	margin-top: 0;
+}
+
 /* LOCKERS */
 
 #lockers {
