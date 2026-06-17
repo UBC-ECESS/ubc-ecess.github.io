@@ -22,12 +22,14 @@ function parseYear(code) {
 /*
  * Icon and Label Metadata for Resource Types
  */
-const RESOURCE_TYPE_META = {
-  "Video Playlist": { icon: "video", label: "Video Playlist" },
+const RESOURCE_TYPES = {
+  "Website": { icon: "link", label: "Course Website" },
   "Syllabus": { icon: "file-lines", label: "Syllabus" },
   "Notes": { icon: "note-sticky", label: "Notes" },
+  "Cheat Sheet": { icon: "note-sticky", label: "Cheat Sheet" },
+  "Tutorials": { icon: "chalkboard-user", label: "Tutorials" },
   "Practice": { icon: "pencil", label: "Practice" },
-  "Website": { icon: "link", label: "Course Website" },
+  "Video Playlist": { icon: "video", label: "Video Playlist" },
 };
 
 function makeCourses() {
@@ -95,12 +97,12 @@ function makeCourses() {
 
     const resources = resourcesByCode.get(code) ?? [];
     if (resources.length === 1) {
-      const meta = RESOURCE_TYPE_META[resources[0].type] ?? { icon: "link", label: resources[0].type ?? "Link" };
+      const meta = RESOURCE_TYPES[resources[0].type] ?? { icon: "link", label: resources[0].type ?? "Link" }; // Set Icon for Resource Type, Default to Link Icon
       html += `<a class="button link" href="${resources[0].link}" target="_blank"><i class="fa-solid fa-${meta.icon}"></i>${meta.label}</a>`;
     } else if (resources.length > 1) {
       html += `<details class="course-resources"><summary class="button link"><i class="fa-solid fa-book-open"></i>Resources <i class="fa-solid fa-chevron-down chevron"></i></summary><div class="course-resources-list">`;
       for (const res of resources) {
-        const meta = RESOURCE_TYPE_META[res.type] ?? { icon: "link", label: res.type ?? "Link" };
+        const meta = RESOURCE_TYPES[res.type] ?? { icon: "link", label: res.type ?? "Link" };
         html += `<div><a class="button link" href="${res.link}" target="_blank"><i class="fa-solid fa-${meta.icon}"></i>${meta.label}</a></div>`;
       }
       html += `</div></details>`;
@@ -111,7 +113,7 @@ function makeCourses() {
   }
 
   if (idx === 0) {
-    html = `<li><div class="no-entries">No courses listed yet...Check back soon!</div></li>`;
+    html = `<li><div class="no-entries">No Courses Listed Yet...Check Back Soon!</div></li>`;
   }
 
   document.getElementById("courses-grid").innerHTML = html;

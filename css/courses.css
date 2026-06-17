@@ -1,0 +1,126 @@
+/* COURSES */
+
+#course-years {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: stretch;
+	gap: var(--gap-width);
+	width: 100%;
+	flex-wrap: wrap;
+}
+
+#course-years li {
+	flex-grow: 1;
+}
+
+#course-years li button {
+	width: 100%;
+	padding: var(--thick-padding);
+}
+
+#courses-grid {
+	display: grid;
+	width: var(--grid-width);
+	grid-template-columns: repeat(var(--grid-columns), 1fr);
+	grid-template-rows: auto;
+	column-gap: var(--grid-col-gap);
+	row-gap: var(--grid-row-gap);
+	margin-top: calc(var(--grid-margin-top) / 2);
+	padding: 0;
+	list-style: none;
+}
+
+.course-item {
+	background-color: var(--secondary);
+	border-radius: var(--border-radius);
+	padding: var(--chunky-padding);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 0.4rem;
+	text-align: left;
+}
+
+.course-item .year-badge {
+	font-size: var(--nav-size);
+	font-weight: 600;
+	padding: var(--thin-padding);
+	border-radius: var(--border-radius);
+}
+
+.course-item.year-200 .year-badge {
+	background-color: var(--course-200-bg);
+	color: var(--course-200-h);
+}
+
+.course-item.year-300 .year-badge {
+	background-color: var(--course-300-bg);
+	color: var(--course-300-h);
+}
+
+.course-item.year-400 .year-badge {
+	background-color: var(--course-400-bg);
+	color: var(--course-400-h);
+}
+
+.course-item h2 {
+	font-size: var(--h4-size);
+	margin: 0.2rem 0 0 0;
+}
+
+.course-item h3 {
+	font-size: var(--body-size);
+	font-weight: 400;
+	margin: 0;
+	flex-grow: 1;
+}
+
+.course-item .button.link {
+	margin-top: 0.5rem;
+	padding: var(--thin-padding);
+}
+
+.course-item details.course-resources {
+	margin-top: 0.5rem;
+	width: 100%;
+}
+
+.course-item details.course-resources summary {
+	list-style: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+}
+
+.course-item details.course-resources summary::-webkit-details-marker {
+	display: none;
+}
+
+.course-item details.course-resources summary .chevron {
+	font-size: 0.7em;
+	transition: transform 0.2s ease;
+	margin-left: 0.1em;
+}
+
+.course-item details.course-resources[open] summary .chevron {
+	transform: rotate(180deg);
+}
+
+.course-item details.course-resources .course-resources-list {
+	padding: 0.5rem 0 0 0;
+	margin: 0;
+}
+
+.course-item details.course-resources .course-resources-list > div {
+	margin-top: 0.5rem;
+}
+
+.course-item details.course-resources .course-resources-list > div > .button.link {
+	display: block;
+	margin-top: 0;
+}

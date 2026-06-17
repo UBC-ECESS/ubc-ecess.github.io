@@ -1,0 +1,239 @@
+/* ALUMNI MARQUEE */
+
+#alumni-marquee {
+	width: 100%;
+	padding: 1rem 0 2rem;
+	text-align: center;
+}
+
+.marquee-outer {
+	overflow: hidden;
+	width: 100%;
+	mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+	-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+	display: flex;
+	align-items: center;
+	gap: 5rem;
+	width: max-content;
+	animation: marquee-scroll 15s linear infinite;
+}
+
+.marquee-outer:hover .marquee-track {
+	animation-play-state: paused;
+}
+
+.marquee-logo {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+	opacity: 0.55;
+	transition: opacity 0.2s ease;
+}
+
+.marquee-logo:hover {
+	opacity: 1;
+}
+
+.marquee-logo img {
+	height: 48px;
+	width: auto;
+}
+
+
+@keyframes marquee-scroll {
+	from { transform: translateX(0); }
+	to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.marquee-track {
+		animation: none;
+	}
+}
+
+/* SPONSORS */
+
+#sponsors-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: stretch;
+	gap: 3rem;
+	width: 100%;
+}
+
+#sponsors-container>:first-child {
+	flex: 1 1 60%;
+}
+
+#sponsors-container>:last-child {
+	flex: 1 0 40%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+@media (max-width: 1130px) {
+	#sponsors-container {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	#sponsors-container>:first-child {
+		flex: 1 1 0;
+	}
+
+	#sponsors-container>:last-child {
+		flex: 1 1 0;
+		align-items: center;
+	}
+}
+
+ul.tiers {
+	margin: 0;
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: stretch;
+	gap: 0;
+}
+
+#package-container {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--border-radius);
+	aspect-ratio: 8.5/11;
+}
+
+@media (max-width: 1130px) {
+	#package-container {
+		width: min(100%, calc(calc(100vh - var(--navbar-height) - 150px) * 8.5 / 11));
+		aspect-ratio: 8.5/11;
+	}
+}
+
+#package {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	border: 0;
+}
+
+ul.tiers>li h3 {
+	padding: var(--thin-padding);
+	border-radius: var(--border-radius);
+}
+
+ul.tiers>li:first-child h3 {
+	margin-top: 0;
+}
+
+ul.tiers>li.titanium h3 {
+	color: var(--titanium-h);
+	background-color: var(--titanium-bg);
+}
+
+ul.tiers>li.steel h3 {
+	color: var(--steel-h);
+	background-color: var(--steel-bg);
+}
+
+ul.tiers>li.iron h3 {
+	color: var(--iron-h);
+	background-color: var(--iron-bg);
+}
+
+ul.tiers>li.aluminum h3 {
+	color: var(--aluminum-h);
+	background-color: var(--aluminum-bg);
+}
+
+ul.sponsors {
+	width: 100%;
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: stretch;
+	gap: var(--gap-width);
+	/* gap: calc(3 * var(--gap-width)); */
+	flex-wrap: wrap;
+	/* margin: 1rem 0; */
+	margin: 0;
+}
+
+ul.sponsors>li {
+	flex: 0 0 auto;
+	max-width: 100%;
+}
+
+ul.sponsors>li figure {
+	margin: 0;
+	position: relative;
+	object-fit: contain;
+	max-width: 100%;
+}
+
+ul.sponsors>li figure>img {
+	transform: translateY(0);
+	box-shadow: 0 5px 9px var(--card-shadow);
+	transition-property: transform, box-shadow;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in-out;
+	border-radius: var(--border-radius);
+	max-width: 100%;
+}
+
+ul.tiers>li.titanium ul.sponsors>li:not(.no-entries) figure>img {
+	max-height: var(--titanium-height);
+}
+
+ul.tiers>li.steel ul.sponsors>li:not(.no-entries) figure>img {
+	max-height: var(--steel-height);
+}
+
+ul.tiers>li.iron ul.sponsors>li:not(.no-entries) figure>img {
+	max-height: var(--iron-height);
+}
+
+ul.tiers>li.aluminum ul.sponsors>li:not(.no-entries) figure>img {
+	max-height: var(--aluminum-height);
+}
+
+ul.sponsors>li.no-entries {
+	background-color: var(--background);
+	box-shadow: none;
+	flex: 1 0 0;
+}
+
+ul.sponsors>li figcaption {
+	display: none;
+}
+
+ul.sponsors>li:has(a):hover figure>img {
+	cursor: pointer;
+	transform: translateY(-5px);
+	box-shadow: 0 10px 14px var(--card-shadow)
+}
+
+ul.sponsors>li a {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	object-fit: contain;
+	text-decoration: none;
+}
