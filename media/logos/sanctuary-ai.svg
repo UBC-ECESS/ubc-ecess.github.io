@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 50" role="img" aria-label="Sanctuary AI">
+  <!-- Icon mark: small top oval -->
+  <ellipse cx="13" cy="10" rx="4" ry="7" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+  <!-- Icon mark: larger bottom loop -->
+  <ellipse cx="13" cy="38" rx="9.5" ry="8" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+  <!-- Crossing diagonal lines -->
+  <line x1="9" y1="17" x2="22.5" y2="30" stroke="#1a1a1a" stroke-width="1.4"/>
+  <line x1="17" y1="17" x2="3.5" y2="30" stroke="#1a1a1a" stroke-width="1.4"/>
+  <!-- Wordmark -->
+  <text x="33" y="31"
+        font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="19"
+        font-weight="300"
+        letter-spacing="3"
+        fill="#1a1a1a">SANCTUARY AI</text>
+</svg>

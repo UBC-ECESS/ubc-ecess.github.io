@@ -17,10 +17,13 @@ import {
  */
 const MARQUEE_COMPANIES = [
   { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-ar21.svg" },
-  { name: "Tesla",     logo: "https://cdn.simpleicons.org/tesla"                              },
-  { name: "AMD",       logo: "https://cdn.simpleicons.org/amd"                                },
-  { name: "Synopsys",  logo: "media/logos/synopsys.svg"                                       },
-  { name: "Motorola",  logo: "https://cdn.simpleicons.org/motorola"                           },
+  { name: "Amazon", logo: "https://cdn.simpleicons.org/amazon" },
+  { name: "Tesla",     logo: "https://cdn.simpleicons.org/tesla"    },
+  { name: "NVIDIA",    logo: "https://cdn.simpleicons.org/nvidia"   },
+  { name: "AMD",       logo: "https://cdn.simpleicons.org/amd"      },
+  { name: "Synopsys",  logo: "media/logos/synopsys.svg"             },
+  { name: "Motorola",  logo: "https://cdn.simpleicons.org/motorola" },
+  { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg"                 },
 ];
 
 function makeMarquee() {
