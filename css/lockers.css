@@ -1,0 +1,91 @@
+/* LOCKERS */
+
+#lockers {
+	width: var(--grid-width);
+	display: grid;
+	grid-template-columns: repeat(var(--grid-columns), 1fr);
+	column-gap: var(--grid-col-gap);
+	row-gap: var(--grid-row-gap);
+	padding: 0;
+	margin-top: var(--grid-margin-top);
+	margin-bottom: 1rem;
+	list-style: none;
+}
+
+.locker img {
+	object-fit: cover;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--border-radius);
+}
+
+.locker h2 {
+	margin: var(--item-name-margin);
+	font-size: var(--h4-size);
+	text-align: left;
+}
+
+.locker>div {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: stretch;
+	gap: var(--gap-width);
+}
+
+.locker ul {
+	display: flex;
+	flex-direction: row;
+	justify-content: stretch;
+	align-items: stretch;
+	flex-wrap: wrap;
+	padding: 0;
+	gap: var(--gap-width);
+	margin: calc(1.5 * var(--gap-width)) 0 0 0;
+}
+
+.locker li,
+.locker .unavailable {
+	list-style-type: none;
+	flex-grow: 1;
+	background-color: var(--secondary);
+	padding: var(--standard-padding);
+	border-radius: var(--border-radius);
+	white-space: nowrap;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.locker .unavailable {
+	background-color: var(--red);
+	color: var(--text-alt);
+	padding: var(--thick-padding);
+	margin-top: var(--gap-width);
+}
+
+.locker li i {
+	color: var(--text);
+	margin-right: var(--icon-margin);
+}
+
+.locker .availability {
+	flex-direction: column;
+}
+
+.locker .availability li {
+	background-color: var(--green);
+	color: var(--text-alt);
+}
+
+.locker .availability li i {
+	color: var(--text-alt);
+}
+
+.locker .availability li.running-low {
+	background-color: var(--yellow);
+}
+
+.locker .availability li.none-left {
+	background-color: var(--red);
+}

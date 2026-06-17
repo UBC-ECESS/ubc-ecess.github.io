@@ -10,6 +10,30 @@ import {
   commonInit,
 } from "../app.js";
 
+/*
+ * Add/Remove Entries to Update Alumni Marquee
+ * - Use https://cdn.simpleicons.org/{slug} for Companies on simpleicons.org
+ * - Use Direct Image URLs for Companies not on simpleicons.org (e.g. Microsoft, Synopsys)
+ */
+const MARQUEE_COMPANIES = [
+  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-ar21.svg" },
+  { name: "Tesla",     logo: "https://cdn.simpleicons.org/tesla"                              },
+  { name: "AMD",       logo: "https://cdn.simpleicons.org/amd"                                },
+  { name: "Synopsys",  logo: "media/logos/synopsys.svg"                                       },
+  { name: "Motorola",  logo: "https://cdn.simpleicons.org/motorola"                           },
+];
+
+function makeMarquee() {
+  const track = document.getElementById("marquee-track");
+  if (!track) return;
+  const renderItem = (company, hidden) =>
+    `<div class="marquee-logo"${hidden ? ' aria-hidden="true"' : ''}>` +
+    `<img src="${company.logo}" alt="${hidden ? '' : company.name}"></div>`;
+  track.innerHTML =
+    MARQUEE_COMPANIES.map(c => renderItem(c, false)).join("") +
+    MARQUEE_COMPANIES.map(c => renderItem(c, true)).join("");
+}
+
 // SPONSORS
 
 function makeSponsors() {
@@ -82,6 +106,7 @@ function makeSponsors() {
 
 window.addEventListener("DOMContentLoaded", () => {
   commonInit();
+  makeMarquee();
   fetchSheet("socials", makeSocials);
   fetchSheets(["contacts", "positions", "sponsors"], makeSponsors);
 });

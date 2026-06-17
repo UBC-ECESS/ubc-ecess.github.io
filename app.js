@@ -164,11 +164,10 @@ export const NAV_LINKS = [
   { label: "Events", href: "./events" },
   { label: "Council", href: "./council" },
   { label: "Courses", href: "./courses" },
-  { label: "Sponsors", href: "./sponsors" },
+  { label: "Careers", href: "./careers" },
   { label: "Contact", href: "./contact" },
   { label: "Merch", href: "./merch" },
   { label: "Lockers", href: "./lockers" },
-  { label: "Leaderboard", href: "./leaderboard" },
 ];
 
 export let data = {};
