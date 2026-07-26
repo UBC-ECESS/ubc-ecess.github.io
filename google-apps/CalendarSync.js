@@ -581,7 +581,6 @@ function installCalendarSyncTrigger() {
     ScriptApp.newTrigger("syncCalendarToDB")
       .timeBased()
       .everyDays(1)
-      .atHour(6)
       .create();
 
     Logger.log("✓ Trigger Installed Successfully");
