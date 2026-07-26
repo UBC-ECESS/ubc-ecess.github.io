@@ -59,16 +59,18 @@ export function makeEvents(num) {
 
     const hoverRsvpLabel = getCell("events", currEvent, "rsvp_label");
     const hoverRsvpLink = getCell("events", currEvent, "rsvp");
+    const validHoverRsvpLink = getValidEventUrl(hoverRsvpLink);
     const hoverInstagramLink = getCell("events", currEvent, "instagram");
-    if (hoverRsvpLink != null || hoverInstagramLink != null) {
+    const validHoverInstagramLink = getValidEventUrl(hoverInstagramLink);
+    if (validHoverRsvpLink || validHoverInstagramLink) {
       html += '<div class="event-hover-links">';
 
-      if (hoverRsvpLink != null) {
-        html += `<a class="button link icon" href="${hoverRsvpLink}" target="_blank"><i class="fa-solid ${getRsvpIconClass(hoverRsvpLabel, hoverRsvpLink)}"></i></a>`;
+      if (validHoverRsvpLink) {
+        html += `<a class="button link icon" href="${validHoverRsvpLink}" target="_blank"><i class="fa-solid ${getRsvpIconClass(hoverRsvpLabel, validHoverRsvpLink)}"></i></a>`;
       }
 
-      if (hoverInstagramLink != null) {
-        html += `<a class="button link icon" href="${hoverInstagramLink}" target="_blank"><i class="fa-brands fa-instagram" style="transform: scale(1.25);"></i></a>`;
+      if (validHoverInstagramLink) {
+        html += `<a class="button link icon" href="${validHoverInstagramLink}" target="_blank"><i class="fa-brands fa-instagram" style="transform: scale(1.25);"></i></a>`;
       }
 
       html += "</div>";
@@ -91,14 +93,19 @@ export function makeEvents(num) {
     if (anyCellFilled("events", currEvent, ["contacts", "rsvp", "calendar"])) {
       html += '<ul class="event-links">';
 
+      const rsvpLink = getCell("events", currEvent, "rsvp");
+      const validRsvpLink = getValidEventUrl(rsvpLink);
+      const calendarLink = getCell("events", currEvent, "calendar");
+      const validCalendarLink = getValidEventUrl(calendarLink);
+
       html +=
-        getCell("events", currEvent, "rsvp") != null
-          ? `<li><a class="button link" href="${getCell("events", currEvent, "rsvp")}" target="_blank"><i class="fa-solid ${getRsvpIconClass(getCell("events", currEvent, "rsvp_label"), getCell("events", currEvent, "rsvp"))}"></i>RSVP</a></li>`
+        validRsvpLink
+          ? `<li><a class="button link" href="${validRsvpLink}" target="_blank"><i class="fa-solid ${getRsvpIconClass(getCell("events", currEvent, "rsvp_label"), validRsvpLink)}"></i>RSVP</a></li>`
           : "";
 
       html +=
-        getCell("events", currEvent, "calendar") != null
-          ? `<li><a class="button link" href="${getCell("events", currEvent, "calendar")}" target="_blank"><i class="fa-brands fa-google"></i>Add to Calendar</a></li>`
+        validCalendarLink
+          ? `<li><a class="button link" href="${validCalendarLink}" target="_blank"><i class="fa-brands fa-google"></i>Add to Calendar</a></li>`
           : "";
 
       if (getCell("events", currEvent, "contacts") != null) {
@@ -142,6 +149,15 @@ function getRsvpIconClass(label = "", url = "") {
   }
 
   return "fa-reply";
+}
+
+function getValidEventUrl(url) {
+  const value = String(url || "").trim();
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  return "";
 }
 
 window.addEventListener("DOMContentLoaded", () => {
