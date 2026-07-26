@@ -16,6 +16,7 @@ export const SHEETS = {
       "location",
       "contacts",
       "rsvp",
+      "rsvp_label",
       "calendar",
       "instagram",
       "image",

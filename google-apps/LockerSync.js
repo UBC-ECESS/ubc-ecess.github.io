@@ -2,9 +2,10 @@
  * Google Apps Script for Syncing Private Locker Sheet to Public Sheet
  *
  * SETUP INSTRUCTIONS:
- * 1. Open Private Locker Management Sheet in Google Sheets.
+ * 1. Open `Main` Sheet in Private Locker Management Spreadsheet.
  * 2. Go to Extensions → Apps Script and Update Code.
- * 3. Run installTrigger() Once to Set Up Daily Sync.
+ * 3. Run testLockerSync() Once and Approve Permissions.
+ * 4. (Optional) Run installLockerSyncTrigger() Once to Set Up Daily Sync.
  *
  * CONFIGURATION:
  * - PRIVATE_SHEET_ID: Detailed Locker Management Data, User-Editable.
@@ -16,19 +17,21 @@
  */
 
 const PRIVATE_SHEET_ID = "1RYP-CQd0NlMrBrDnOi18g7F3P7Vjxx18tyVZRqNymfY";
-const PUBLIC_SHEET_ID = "17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A";
 
 /*
- * Syncs Locker Data from Private Management Sheet to Public Interface Sheet
- * Transforms and Filters Sensitive Data
+ * Syncs Locker Data from Private Management Sheet to Website Database
  *
  * Private Sheet Columns: [locker, name, email, notes, action, status, serial, combo, student#, discord, notes]
  * Public Sheet Columns: [Set, Number, Taken]
  */
-function syncLockersToPublic() {
+function syncLockersToDB() {
   try {
     const privateDoc = SpreadsheetApp.openById(PRIVATE_SHEET_ID);
     const privateSheet = privateDoc.getSheetByName("Main");
+    if (!privateSheet) {
+      Logger.log("ERROR: No `Main` Sheet in Private Locker Management Spreadsheet");
+      return;
+    }
 
     const range = privateSheet.getDataRange();
     const values = range.getValues();
@@ -60,6 +63,10 @@ function syncLockersToPublic() {
 
     const publicDoc = SpreadsheetApp.openById(PUBLIC_SHEET_ID);
     const publicSheet = publicDoc.getSheetByName("Lockers");
+    if (!publicSheet) {
+      Logger.log("ERROR: No `Lockers` Sheet in Website Database");
+      return;
+    }
 
     publicSheet.clearContents();
     publicSheet.getRange(1, 1, transformedData.length, 3).setValues(transformedData);
@@ -77,7 +84,7 @@ function syncLockersToPublic() {
  * Installs Time-Based Trigger for Automatic Daily Sync.
  * Run to Set Up Automation. Removes Existing Triggers to Avoid Duplicates.
  */
-function installTrigger() {
+function installLockerSyncTrigger() {
   try {
     // Remove Existing Triggers to Avoid Duplicates
     ScriptApp.getProjectTriggers().forEach(trigger => {
@@ -85,13 +92,13 @@ function installTrigger() {
     });
 
     // Create New Trigger: Runs Every 24 Hours
-    ScriptApp.newTrigger("syncLockersToPublic")
+    ScriptApp.newTrigger("syncLockersToDB")
       .timeBased()
       .everyDays(1)
       .create();
 
     Logger.log("✓ Trigger Installed Successfully");
-    Logger.log("✓ syncLockersToPublic() Will Run Automatically Every 24 Hours");
+    Logger.log("✓ syncLockersToDB() Will Run Automatically Every 24 Hours");
 
   } catch (error) {
     Logger.log(`✗ Trigger Installation Failed: ${error.message}`);
@@ -101,10 +108,12 @@ function installTrigger() {
 /*
  * Removes the Automatic Sync Trigger. Use This if You Want to Disable Automatic Syncing.
  */
-function removeTrigger() {
+function removeLockerSyncTrigger() {
   try {
     ScriptApp.getProjectTriggers().forEach(trigger => {
-      ScriptApp.deleteTrigger(trigger);
+      if (trigger.getHandlerFunction() === "syncLockersToDB") {
+        ScriptApp.deleteTrigger(trigger);
+      }
     });
 
     Logger.log("✓ Trigger Removed - Automatic Sync Disabled");
@@ -123,7 +132,7 @@ function sendErrorNotification(error) {
     MailApp.sendEmail(
       email,
       "ECESS Locker Sync Error",
-      `The locker sync failed:\n\n${error.message}\n\nCheck the Apps Script logs for details.`
+      `Locker Sync Failed:\n\n${error.message}\n\nCheck Apps Script Logs for Details.`
     );
   } catch (e) {
     Logger.log("Could Not Send Error Email: " + e.message);
@@ -134,8 +143,8 @@ function sendErrorNotification(error) {
  * Test Function - Runs Sync Once and Logs Results
  * Useful for Debugging Before Setting Up the Trigger
  */
-function testSync() {
+function testLockerSync() {
   Logger.log("Starting Test Sync...");
-  syncLockersToPublic();
+  syncLockersToDB();
   Logger.log("Test Sync Completed - Check Logs Above");
 }
