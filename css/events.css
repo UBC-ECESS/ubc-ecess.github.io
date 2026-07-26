@@ -55,10 +55,21 @@
 	align-items: center;
 }
 
-.event>div a {
+.event-hover-links {
 	position: absolute;
 	left: var(--gap-width);
 	bottom: var(--gap-width);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(var(--gap-width) * 0.8);
+	z-index: 2;
+}
+
+.event-hover-links a {
+	position: relative;
+	left: 0;
+	bottom: 0;
 	font-size: var(--body-size);
 	aspect-ratio: 1;
 	box-sizing: border-box;
@@ -81,9 +92,8 @@
   transition-delay: 0s;
 } */
 
-.event>div:has(a):hover a {
+.event>div:has(.event-hover-links):hover .event-hover-links a {
 	pointer-events: auto;
-	visibility: hidden;
 	opacity: 1;
 	transform: scale(1);
 	animation: var(--pop-in);

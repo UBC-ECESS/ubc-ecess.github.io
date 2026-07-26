@@ -57,8 +57,21 @@ export function makeEvents(num) {
       html += '<i class="fa-solid fa-gear"></i>';
     }
 
-    if (getCell("events", currEvent, "instagram") != null) {
-      html += `<a class="button link icon" href="${getCell("events", currEvent, "instagram")}" target="_blank"><i class="fa-brands fa-instagram" style="transform: scale(1.25);"></i></a>`;
+    const hoverRsvpLabel = getCell("events", currEvent, "rsvp_label");
+    const hoverRsvpLink = getCell("events", currEvent, "rsvp");
+    const hoverInstagramLink = getCell("events", currEvent, "instagram");
+    if (hoverRsvpLink != null || hoverInstagramLink != null) {
+      html += '<div class="event-hover-links">';
+
+      if (hoverRsvpLink != null) {
+        html += `<a class="button link icon" href="${hoverRsvpLink}" target="_blank"><i class="fa-solid ${getRsvpIconClass(hoverRsvpLabel, hoverRsvpLink)}"></i></a>`;
+      }
+
+      if (hoverInstagramLink != null) {
+        html += `<a class="button link icon" href="${hoverInstagramLink}" target="_blank"><i class="fa-brands fa-instagram" style="transform: scale(1.25);"></i></a>`;
+      }
+
+      html += "</div>";
     }
     html += "</div>";
 
@@ -80,7 +93,7 @@ export function makeEvents(num) {
 
       html +=
         getCell("events", currEvent, "rsvp") != null
-          ? `<li><a class="button link" href="${getCell("events", currEvent, "rsvp")}" target="_blank"><i class="fa-solid fa-reply"></i>RSVP</a></li>`
+          ? `<li><a class="button link" href="${getCell("events", currEvent, "rsvp")}" target="_blank"><i class="fa-solid ${getRsvpIconClass(getCell("events", currEvent, "rsvp_label"), getCell("events", currEvent, "rsvp"))}"></i>RSVP</a></li>`
           : "";
 
       html +=
@@ -115,6 +128,20 @@ export function makeEvents(num) {
   }
   document.getElementById("events").innerHTML = html;
   addButtonEvents();
+}
+
+function getRsvpIconClass(label = "", url = "") {
+  const normalizedLabel = String(label || "").toLowerCase();
+  if (normalizedLabel.includes("ticket") || normalizedLabel.includes("eventbrite")) {
+    return "fa-ticket";
+  }
+
+  const normalizedUrl = String(url || "").toLowerCase();
+  if (normalizedUrl.includes("eventbrite") || normalizedUrl.includes("ticket")) {
+    return "fa-ticket";
+  }
+
+  return "fa-reply";
 }
 
 window.addEventListener("DOMContentLoaded", () => {
