@@ -1,5 +1,18 @@
 /* LOCKERS */
 
+#lockers-page {
+	--section-header-height: min(70vw, 720px);
+}
+
+#lockers-page .section-header > img {
+	width: 100%;
+	height: var(--section-header-height);
+	margin: 0;
+	object-fit: cover;
+	object-position: center 45%;
+	filter: brightness(0.7);
+}
+
 #lockers {
 	width: var(--grid-width);
 	display: grid;
