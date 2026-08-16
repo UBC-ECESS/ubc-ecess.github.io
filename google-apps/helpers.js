@@ -1,1 +1,1 @@
-const PUBLIC_SHEET_ID = "17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A";
+const DB_SHEET_ID = "17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A";

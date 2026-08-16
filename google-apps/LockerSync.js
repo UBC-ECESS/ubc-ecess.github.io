@@ -8,15 +8,15 @@
  * 4. (Optional) Run installLockerSyncTrigger() Once to Set Up Daily Sync.
  *
  * CONFIGURATION:
- * - PRIVATE_SHEET_ID: Detailed Locker Management Data, User-Editable.
- * - PUBLIC_SHEET_ID: Minimal Public Interface, Read-Only for Website.
+ * - LOCKER_SHEET_ID: Detailed Locker Management Data, User-Editable.
+ * - DB_SHEET_ID: Minimal Public Interface, Read-Only for Website.
  *
  * This Script Transforms Sensitive Data Into a Minimal Public Interface:
  * Private Columns (Excluded): name, email, notes, action, status, serial, combo, student number, discord username
  * Public Columns (Exposed): Set, Number, Taken
  */
 
-const PRIVATE_SHEET_ID = "1RYP-CQd0NlMrBrDnOi18g7F3P7Vjxx18tyVZRqNymfY";
+const LOCKER_SHEET_ID = "1RYP-CQd0NlMrBrDnOi18g7F3P7Vjxx18tyVZRqNymfY";
 
 /*
  * Syncs Locker Data from Private Management Sheet to Website Database
@@ -26,7 +26,7 @@ const PRIVATE_SHEET_ID = "1RYP-CQd0NlMrBrDnOi18g7F3P7Vjxx18tyVZRqNymfY";
  */
 function syncLockersToDB() {
   try {
-    const privateDoc = SpreadsheetApp.openById(PRIVATE_SHEET_ID);
+    const privateDoc = SpreadsheetApp.openById(LOCKER_SHEET_ID);
     const privateSheet = privateDoc.getSheetByName("Main");
     if (!privateSheet) {
       Logger.log("ERROR: No `Main` Sheet in Private Locker Management Spreadsheet");
@@ -61,7 +61,7 @@ function syncLockersToDB() {
       transformedData.push([setName, lockerNumber, taken]);
     }
 
-    const publicDoc = SpreadsheetApp.openById(PUBLIC_SHEET_ID);
+    const publicDoc = SpreadsheetApp.openById(DB_SHEET_ID);
     const publicSheet = publicDoc.getSheetByName("Lockers");
     if (!publicSheet) {
       Logger.log("ERROR: No `Lockers` Sheet in Website Database");
