@@ -8,7 +8,7 @@
  * 4. Run installCalendarSyncTrigger() Once to Set Up Daily Sync.
  *
  * CONFIGURATION:
-  * - PUBLIC_SHEET_ID: Minimal Public Interface, Read-Only for Website.
+ * - DB_SHEET_ID: Minimal Public Interface, Read-Only for Website.
  * - CALENDAR_ID: Source ECESS Google Calendar ID.
  * - IMAGES_FOLDER_ID: Drive Folder for Downloaded Event Images.
  *
@@ -33,7 +33,7 @@ const IMAGES_FOLDER_ID = "1Swt-X7DqkXkmuaM8sCBWLDtuYA7wGwHt";
  */
 function syncCalendarToDB() {
   try {
-    const publicDoc = SpreadsheetApp.openById(PUBLIC_SHEET_ID);
+    const publicDoc = SpreadsheetApp.openById(DB_SHEET_ID);
     const eventsSheet = publicDoc.getSheetByName("Events");
     if (!eventsSheet) {
       Logger.log("ERROR: No `Events` Sheet in Website Database");

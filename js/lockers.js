@@ -103,8 +103,36 @@ function makeLockers() {
   document.getElementById("lockers").innerHTML = html;
 }
 
+/*
+ * Makes Locker Form Embed
+ */
+function makeLockerForm() {
+  // Iterate Through Links and Find Locker Form
+  for (let i = 0; i < data.links.length; i++) {
+    if (
+      anyCellNull("links", i, ["name", "link"]) == true ||
+      getCell("links", i, "show") == false ||
+      String(getCell("links", i, "name")).trim() != "Locker Form"
+    ) {
+      continue;
+    }
+
+    // Convert Form URL to Embedded Form URL
+    let formUrl = getCell("links", i, "link");
+    if (formUrl.indexOf("/viewform") > -1) {
+      formUrl = formUrl.split("?")[0] + "?embedded=true";
+    }
+
+    // Set Form URL and Display Form
+    document.getElementById("locker-form-frame").src = formUrl;
+    document.getElementById("locker-form").style.display = "";
+    break;
+  }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   commonInit();
   fetchSheet("socials", makeSocials);
+  fetchSheet("links", makeLockerForm);
   fetchSheets(["lockers", "sets"], makeLockers);
 });
