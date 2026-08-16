@@ -45,7 +45,7 @@ function makeSponsors() {
     .setAttribute(
       "src",
       driveUrlToPreview(
-        "https://drive.google.com/file/d/1JFjuADqjNiTIVkD6PpZ6IxTFT3zMWaru/view?usp=drive_link",
+        "https://drive.google.com/file/d/1Qh8cBZtHoSJyGFZhL7a6ypQCqCeue9Qi/view?usp=sharing",
       ),
     );
 
