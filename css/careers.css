@@ -1,9 +1,71 @@
-/* ALUMNI MARQUEE */
+/* ALUMNI LOGOS */
 
 #alumni-marquee {
-	width: 100%;
+	width: var(--inner-width);
+	max-width: 100%;
+	margin-inline: auto;
 	padding: 1rem 0 2rem;
 	text-align: center;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+#alumni-marquee h2 {
+	margin-left: 0;
+	margin-right: 0;
+	padding: 0 0.75rem;
+	box-sizing: border-box;
+	overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+	#alumni-marquee h2 {
+		font-size: var(--h3-size);
+	}
+}
+
+.alumni-logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	opacity: 0.7;
+	transition: opacity 0.2s ease;
+}
+
+.alumni-logo:hover {
+	opacity: 1;
+}
+
+.alumni-logo img {
+	display: block;
+	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 40px;
+	object-fit: contain;
+}
+
+.alumni-logo-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: center;
+	justify-items: center;
+	gap: 1.5rem 1.25rem;
+	width: 100%;
+	padding: 0.5rem 0.75rem 0;
+	box-sizing: border-box;
+}
+
+.alumni-logo-grid .alumni-logo {
+	width: 100%;
+	height: 48px;
+	opacity: 0.8;
+}
+
+.alumni-logo-grid .alumni-logo img {
+	max-height: 32px;
+	max-width: 90%;
 }
 
 .marquee-outer {
@@ -18,32 +80,22 @@
 	align-items: center;
 	gap: 5rem;
 	width: max-content;
-	animation: marquee-scroll 15s linear infinite;
+	animation: marquee-scroll 30s linear infinite;
 }
 
 .marquee-outer:hover .marquee-track {
 	animation-play-state: paused;
 }
 
-.marquee-logo {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.5rem;
+.marquee-track .alumni-logo {
 	flex-shrink: 0;
-	opacity: 0.55;
-	transition: opacity 0.2s ease;
-}
-
-.marquee-logo:hover {
-	opacity: 1;
-}
-
-.marquee-logo img {
 	height: 48px;
-	width: auto;
+	opacity: 0.55;
+}
+
+.marquee-track .alumni-logo img {
+	max-height: 48px;
 	max-width: 160px;
-	object-fit: contain;
 }
 
 @keyframes marquee-scroll {
@@ -51,29 +103,9 @@
 	to { transform: translateX(-50%); }
 }
 
-@media (max-width: 768px), (prefers-reduced-motion: reduce) {
-	.marquee-outer {
-		overflow: visible;
-		mask-image: none;
-		-webkit-mask-image: none;
-	}
-
+@media (prefers-reduced-motion: reduce) {
 	.marquee-track {
-		flex-wrap: wrap;
-		justify-content: center;
-		width: 100%;
-		gap: 1.25rem 1.75rem;
-		padding: 0 1rem;
 		animation: none;
-	}
-
-	.marquee-logo[aria-hidden="true"] {
-		display: none;
-	}
-
-	.marquee-logo img {
-		height: 36px;
-		max-width: 110px;
 	}
 }
 
