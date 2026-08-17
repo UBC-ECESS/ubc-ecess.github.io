@@ -78,8 +78,8 @@ Locker sync maps private sheet fields to public fields as follows.
 | `locker` in 300-399 | `Set` = Floor 3 |
 | `locker` in 400-499 | `Set` = Floor 4 |
 | `locker` value | `Number` |
-| `status` = Reserved or ECESS | `Taken` = TRUE |
-| `status` = unassigned | `Taken` = FALSE |
+| `status` = Reserved, ECESS, or action required | `Taken` = TRUE |
+| `status` = unassigned or Expired | `Taken` = FALSE |
 
 Private columns like name, email, combo, student number, and notes are not copied.
 

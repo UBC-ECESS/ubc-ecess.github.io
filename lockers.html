@@ -17,7 +17,7 @@
 	<link rel="manifest" href="favicon/manifest.webmanifest" />
 	<!-- STYLING -->
 	<link rel="stylesheet" href="styles.css?version=10" />
-	<link rel="stylesheet" href="css/lockers.css?version=13" />
+	<link rel="stylesheet" href="css/lockers.css?version=16" />
 	<link href="assets/css/fontawesome.css" rel="stylesheet" />
 	<link href="assets/css/solid.css" rel="stylesheet" />
 	<link href="assets/css/brands.css" rel="stylesheet" />
@@ -39,13 +39,18 @@
 		<ul id="lockers"></ul>
 		<div id="locker-detail" style="display: none;"></div>
 		<div id="locker-form" class="inner" style="display: none; margin-top: 1.5rem;">
-			<h2 style="text-align: center; margin-bottom: 1rem;">Summer 2026 MCLD Locker Sign-Up</h2>
+			<h2>Winter 2026–27 MCLD Locker Sign-Up</h2>
+			<p id="locker-selected-label">Click an available locker above, then paste its number into the form.</p>
+			<div id="locker-copy-bar" hidden>
+				<strong id="locker-copy-number"></strong>
+				<button type="button" class="button" id="locker-copy-btn"><i class="fa-solid fa-copy"></i>Copy Locker Number</button>
+			</div>
 			<div style="display: flex; justify-content: center;">
 				<iframe id="locker-form-frame" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0" style="max-width: 100%;">Loading…</iframe>
 			</div>
 		</div>
 	</div>
-	<script type="module" src="js/lockers.js"></script>
+	<script type="module" src="js/lockers.js?version=5"></script>
 </body>
 
 </html>

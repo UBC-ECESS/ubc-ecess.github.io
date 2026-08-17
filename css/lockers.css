@@ -173,11 +173,31 @@
 	border-radius: var(--border-radius);
 	font-size: var(--nav-size);
 	font-weight: 600;
+	border: none;
+	padding: 0;
+	font-family: inherit;
+	color: inherit;
+}
+
+button.locker-cell.available {
+	cursor: pointer;
+}
+
+button.locker-cell.available:hover,
+button.locker-cell.available:focus-visible {
+	filter: brightness(1.08);
+	outline: 2px solid var(--primary-20);
+	outline-offset: 2px;
 }
 
 .locker-cell.available {
 	background-color: var(--green);
 	color: var(--text-alt);
+}
+
+.locker-cell.available.selected {
+	background-color: var(--primary-20);
+	box-shadow: 0 0 0 3px var(--primary-40);
 }
 
 .locker-cell.taken {
@@ -208,4 +228,34 @@
 .locker-legend .locker-cell {
 	width: 1.2rem;
 	min-height: 1.2rem;
+}
+
+#locker-form {
+	margin-top: 2rem;
+	text-align: center;
+}
+
+#locker-form h2,
+#locker-selected-label {
+	max-width: 720px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#locker-copy-bar {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: var(--gap-width);
+	margin: 0 0 1rem 0;
+}
+
+#locker-copy-bar[hidden] {
+	display: none;
+}
+
+#locker-copy-number {
+	font-size: var(--h4-size);
+	color: var(--primary-20);
 }
