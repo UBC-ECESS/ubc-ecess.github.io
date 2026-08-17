@@ -61,12 +61,12 @@ function makeLockers() {
       }
     }
 
-    html += `<div class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} available</div>`;
+    html += `<div class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} Available</div>`;
     html += "</div>";
 
     if (getCell("sets", i, "unavailable") == true) {
       html +=
-        '<div class="unavailable"><i class="fa-solid fa-circle-xmark"></i>Temporarily unavailable</div>';
+        '<div class="unavailable"><i class="fa-solid fa-circle-xmark"></i>Temporarily Unavailable</div>';
     }
 
     html += "</li>";
@@ -97,15 +97,22 @@ function openLockerMapPreview(mapButton) {
 }
 
 /*
- * Binds Hover and Click Handlers for Map Preview Buttons.
+ * Binds Map Preview Handlers.
+ * Desktop Uses Hover. Mobile Uses Click.
  */
 function bindLockerMapPreviews() {
+  const hoverEnabled = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   document.querySelectorAll(".locker-map").forEach((mapButton) => {
-    mapButton.addEventListener("mouseenter", () => {
-      openLockerMapPreview(mapButton);
-    });
+    if (hoverEnabled) {
+      mapButton.addEventListener("mouseenter", () => {
+        openLockerMapPreview(mapButton);
+      });
+    }
+
     mapButton.addEventListener("click", (event) => {
       event.preventDefault();
+      event.stopPropagation();
       if (mapButton.classList.contains("open")) {
         closeLockerMapPreviews();
       } else {
