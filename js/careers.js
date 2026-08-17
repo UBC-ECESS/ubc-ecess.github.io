@@ -12,18 +12,17 @@ import {
 
 /*
  * Add/Remove Entries to Update Alumni Marquee
- * - Use https://cdn.simpleicons.org/{slug} for Companies on simpleicons.org
- * - Use Direct Image URLs for Companies not on simpleicons.org (e.g. Microsoft, Synopsys)
+ * Logos Live in media/logos so They Load Reliably on Mobile
  */
 const MARQUEE_COMPANIES = [
-  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-ar21.svg" },
-  { name: "Amazon", logo: "https://cdn.simpleicons.org/amazon" },
-  { name: "Tesla",     logo: "https://cdn.simpleicons.org/tesla"    },
-  { name: "NVIDIA",    logo: "https://cdn.simpleicons.org/nvidia"   },
-  { name: "AMD",       logo: "https://cdn.simpleicons.org/amd"      },
-  { name: "Synopsys",  logo: "media/logos/synopsys.svg"             },
-  { name: "Motorola",  logo: "https://cdn.simpleicons.org/motorola" },
-  { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg"                 },
+  { name: "Microsoft", logo: "media/logos/microsoft.svg" },
+  { name: "Amazon", logo: "media/logos/amazon.svg" },
+  { name: "Tesla", logo: "media/logos/tesla.svg" },
+  { name: "NVIDIA", logo: "media/logos/nvidia.svg" },
+  { name: "AMD", logo: "media/logos/amd.svg" },
+  { name: "Synopsys", logo: "media/logos/synopsys.svg" },
+  { name: "Motorola", logo: "media/logos/motorola.svg" },
+  { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg" },
 ];
 
 function makeMarquee() {

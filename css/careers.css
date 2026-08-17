@@ -42,17 +42,38 @@
 .marquee-logo img {
 	height: 48px;
 	width: auto;
+	max-width: 160px;
+	object-fit: contain;
 }
-
 
 @keyframes marquee-scroll {
 	from { transform: translateX(0); }
 	to { transform: translateX(-50%); }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+	.marquee-outer {
+		overflow: visible;
+		mask-image: none;
+		-webkit-mask-image: none;
+	}
+
 	.marquee-track {
+		flex-wrap: wrap;
+		justify-content: center;
+		width: 100%;
+		gap: 1.25rem 1.75rem;
+		padding: 0 1rem;
 		animation: none;
+	}
+
+	.marquee-logo[aria-hidden="true"] {
+		display: none;
+	}
+
+	.marquee-logo img {
+		height: 36px;
+		max-width: 110px;
 	}
 }
 

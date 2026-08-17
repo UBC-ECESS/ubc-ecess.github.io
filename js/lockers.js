@@ -130,18 +130,12 @@ function makeLockers() {
     const freeCount = countFreeLockers(name);
 
     html += `<li class="locker">`;
-    html += `<div class="locker-card">`;
+    html += `<button type="button" class="locker-open" data-set-index="${i}" aria-label="View ${name} lockers">`;
 
     if (getCell("sets", i, "image") != null) {
-      const mapUrl = driveUrlToThumb(getCell("sets", i, "image"));
-      html += `<button type="button" class="locker-map" data-set-index="${i}" aria-label="Enlarge ${name} map">`;
-      html += `<img src="${mapUrl}" alt="${name} map">`;
-      html += `<span class="locker-map-hint"><i class="fa-solid fa-expand"></i>Click to Enlarge</span>`;
-      html += `<span class="locker-map-preview"><img src="${mapUrl}" alt=""></span>`;
-      html += `</button>`;
+      html += `<img class="locker-map" src="${driveUrlToThumb(getCell("sets", i, "image"))}" alt="${name} map">`;
     }
 
-    html += `<button type="button" class="locker-open" data-set-index="${i}" aria-label="View ${name} lockers">`;
     html += `<h2>${name}</h2>`;
     html += `<div class="locker-card-meta">`;
     if (getCell("sets", i, "location") != null) {
@@ -156,7 +150,7 @@ function makeLockers() {
       html += `<div class="unavailable"><i class="fa-solid fa-circle-xmark"></i>Temporarily Unavailable</div>`;
     }
 
-    html += `</div></li>`;
+    html += `</li>`;
   }
 
   document.getElementById("lockers").innerHTML = html;
@@ -179,13 +173,12 @@ function openFloorLayout(setIndex) {
  * Returns to the Floor Overview Cards.
  */
 function closeFloorLayout() {
-  closeMapPreview();
   document.getElementById("locker-detail").style.display = "none";
   document.getElementById("lockers").style.display = "";
 }
 
 /*
- * Renders the Active Floor: Map, Section Grids, and Floor Switcher.
+ * Renders the Active Floor: Section Grids and Floor Switcher.
  */
 function renderFloorLayout() {
   const setIndex = visibleFloors[currentFloorIdx];
@@ -195,7 +188,7 @@ function renderFloorLayout() {
   const freeCount = countFreeLockers(name);
 
   let html = `<div class="locker-detail-bar">`;
-  html += `<button type="button" class="button" id="locker-back"><i class="fa-solid fa-arrow-left"></i>All floors</button>`;
+  html += `<button type="button" class="button" id="locker-back"><i class="fa-solid fa-arrow-left"></i>Back</button>`;
   html += `<div class="floor-switcher">`;
   html += `<button type="button" class="button icon" id="floor-prev" aria-label="Previous floor"${currentFloorIdx == 0 ? " disabled" : ""}><i class="fa-solid fa-chevron-left"></i></button>`;
   html += `<h2>${name} <span>/ ${visibleFloors.length}</span></h2>`;
@@ -203,15 +196,6 @@ function renderFloorLayout() {
   html += `</div>`;
   html += `<span class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} Available</span>`;
   html += `</div>`;
-
-  if (getCell("sets", setIndex, "image") != null) {
-    const mapUrl = driveUrlToThumb(getCell("sets", setIndex, "image"));
-    html += `<button type="button" class="locker-map" id="floor-map" aria-label="Enlarge ${name} map">`;
-    html += `<img src="${mapUrl}" alt="${name} orientation map">`;
-    html += `<span class="locker-map-hint"><i class="fa-solid fa-expand"></i>Click to enlarge</span>`;
-    html += `<span class="locker-map-preview"><img src="${mapUrl}" alt=""></span>`;
-    html += `</button>`;
-  }
 
   html += `<div class="locker-sections">`;
   for (let i = 0; i < sections.length; i++) {
@@ -230,7 +214,6 @@ function renderFloorLayout() {
 
 /*
  * Binds Click Handlers for Overview Cards.
- * Map Thumbnail Enlarges; Card Opens the Floor Layout.
  */
 function bindLockerCards() {
   document.querySelectorAll(".locker-open").forEach((button) => {
@@ -238,22 +221,10 @@ function bindLockerCards() {
       openFloorLayout(Number(button.getAttribute("data-set-index")));
     });
   });
-
-  document.querySelectorAll("#lockers .locker-map").forEach((mapButton) => {
-    mapButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (mapButton.classList.contains("open")) {
-        closeMapPreview();
-      } else {
-        closeMapPreview();
-        mapButton.classList.add("open");
-      }
-    });
-  });
 }
 
 /*
- * Binds Back, Floor Switch, and Map Enlarge Clicks on the Detail View.
+ * Binds Back and Floor Switch Clicks on the Detail View.
  */
 function bindFloorLayout() {
   document.getElementById("locker-back").addEventListener("click", closeFloorLayout);
@@ -270,28 +241,6 @@ function bindFloorLayout() {
       currentFloorIdx++;
       renderFloorLayout();
     }
-  });
-
-  const mapButton = document.getElementById("floor-map");
-  if (mapButton) {
-    mapButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (mapButton.classList.contains("open")) {
-        closeMapPreview();
-      } else {
-        mapButton.classList.add("open");
-      }
-    });
-  }
-}
-
-/*
- * Closes the Fullscreen Map Preview.
- */
-function closeMapPreview() {
-  document.querySelectorAll(".locker-map.open").forEach((el) => {
-    el.classList.remove("open");
-    el.blur();
   });
 }
 
