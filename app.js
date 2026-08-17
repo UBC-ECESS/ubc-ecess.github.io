@@ -91,21 +91,7 @@ export const SHEETS = {
   sets: {
     SHEET: "Sets",
     DOC: DATABASE_DOC,
-    COLS: [
-      "name",
-      "location",
-      "numbers",
-      "size",
-      "cost",
-      "period",
-      "lock",
-      "unavailable",
-      "direction",
-      "count",
-      "offset",
-      "image",
-      "show",
-    ],
+    COLS: ["name", "location", "unavailable", "image", "show"],
   },
   matches: {
     SHEET: "Matches",

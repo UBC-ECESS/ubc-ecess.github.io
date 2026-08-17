@@ -11,12 +11,18 @@ import {
 
 // LOCKERS
 
+const MAP_PREVIEW_TIMEOUT = 2000;
+let mapPreviewTimer;
+
+/*
+ * Renders Locker Set Cards from Sets and Lockers Sheets.
+ * Each Card Shows Map, Name, Location, and Free Count.
+ */
 function makeLockers() {
   let html = "";
   for (let i = 0; i < data.sets.length; i++) {
     if (
-      anyCellNull("sets", i, ["name", "location", "period", "size", "cost"]) ==
-        true ||
+      getCell("sets", i, "name") == null ||
       getCell("sets", i, "show") == false
     ) {
       continue;
@@ -25,36 +31,23 @@ function makeLockers() {
     html += '<li class="locker">';
 
     if (getCell("sets", i, "image") != null) {
-      html += `<img src="${driveUrlToThumb(getCell("sets", i, "image"))}">`;
+      const mapUrl = driveUrlToThumb(getCell("sets", i, "image"));
+      html += `<button type="button" class="locker-map" aria-label="View ${getCell("sets", i, "name")} map">`;
+      html += `<img src="${mapUrl}" alt="${getCell("sets", i, "name")} map">`;
+      html += `<span class="locker-map-preview"><img src="${mapUrl}" alt=""></span>`;
+      html += `</button>`;
     }
 
     html += `<h2>${getCell("sets", i, "name")}</h2>`;
     html += "<div>";
     html += '<ul class="info">';
 
-    html += `<li><i class="fa-solid fa-location-dot"></i>${getCell("sets", i, "location")}</li>`;
-    html += `<li><i class="fa-solid fa-${getCell("sets", i, "period") == "Year-round" ? "calendar" : "calendar-week"}"></i>${getCell("sets", i, "period")}</li>`;
-    let numRange = getCell("sets", i, "numbers").split("-");
-    html += `<li><i class="fa-solid fa-hashtag"></i>${numRange[0]}–${numRange[1]}</li>`;
-    html += `<li><i class="fa-solid fa-ruler-combined"></i>${getCell("sets", i, "size")}</li>`;
-    if (getCell("sets", i, "lock") == true) {
-      html += `<li><i class="fa-solid fa-lock"></i>Lock included</li>`;
-    } else {
-      html += `<li><i class="fa-solid fa-lock-open"></i>Lock not included</li>`;
+    if (getCell("sets", i, "location") != null) {
+      html += `<li><i class="fa-solid fa-location-dot"></i>${getCell("sets", i, "location")}</li>`;
     }
-    html += `<li><i class="fa-solid fa-money-bill-wave"></i>$${getCell("sets", i, "cost")}/term</li>`;
     html += "</ul>";
 
-    let dir = getCell("sets", i, "direction").toLowerCase();
-    let isWeave = dir.indexOf("weave") > -1;
-
-    let availability = [];
-    for (let j = 0; j < getCell("sets", i, "count"); j++) {
-      availability.push(0);
-    }
-
-    let isOddCol = false;
-    let lockerIdx = 0;
+    let freeCount = 0;
     for (let j = 0; j < data.lockers.length; j++) {
       if (
         getCell("lockers", j, "set") != getCell("sets", i, "name") ||
@@ -63,33 +56,12 @@ function makeLockers() {
         continue;
       } // skip blank entries and lockers in other sets
 
-      if (
-        (lockerIdx + Number(getCell("sets", i, "offset"))) %
-          getCell("sets", i, "count") ==
-        0
-      ) {
-        isOddCol = !isOddCol;
-      }
-
-      let rowIdx =
-        (lockerIdx + Number(getCell("sets", i, "offset"))) %
-        getCell("sets", i, "count");
-      if (isWeave && !isOddCol) {
-        rowIdx = getCell("sets", i, "count") - 1 - rowIdx;
-      }
-
       if (getCell("lockers", j, "taken") == false) {
-        availability[rowIdx] += 1;
+        freeCount++;
       }
-
-      lockerIdx++;
     }
 
-    html += '<ul class="availability">';
-    for (let j = 0; j < availability.length; j++) {
-      html += `<li${availability[j] == 0 ? ' class="none-left"' : availability[j] < 5 ? ' class="running-low"' : ""}><i class="fa-solid fa-${j == 0 ? "arrow-up" : j == availability.length - 1 ? "arrow-down" : "minus"}"></i>${availability[j]} </li>`;
-    }
-    html += "</ul>";
+    html += `<div class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} available</div>`;
     html += "</div>";
 
     if (getCell("sets", i, "unavailable") == true) {
@@ -101,10 +73,50 @@ function makeLockers() {
   }
 
   document.getElementById("lockers").innerHTML = html;
+  bindLockerMapPreviews();
 }
 
 /*
- * Makes Locker Form Embed
+ * Closes Any Open Map Preview and Clears the Auto-Close Timer.
+ */
+function closeLockerMapPreviews() {
+  clearTimeout(mapPreviewTimer);
+  document.querySelectorAll(".locker-map.open").forEach((el) => {
+    el.classList.remove("open");
+    el.blur();
+  });
+}
+
+/*
+ * Opens a Map Preview and Closes It After MAP_PREVIEW_TIMEOUT.
+ */
+function openLockerMapPreview(mapButton) {
+  closeLockerMapPreviews();
+  mapButton.classList.add("open");
+  mapPreviewTimer = setTimeout(closeLockerMapPreviews, MAP_PREVIEW_TIMEOUT);
+}
+
+/*
+ * Binds Hover and Click Handlers for Map Preview Buttons.
+ */
+function bindLockerMapPreviews() {
+  document.querySelectorAll(".locker-map").forEach((mapButton) => {
+    mapButton.addEventListener("mouseenter", () => {
+      openLockerMapPreview(mapButton);
+    });
+    mapButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (mapButton.classList.contains("open")) {
+        closeLockerMapPreviews();
+      } else {
+        openLockerMapPreview(mapButton);
+      }
+    });
+  });
+}
+
+/*
+ * Embeds the Locker Form from the Links Sheet Row Named "Locker Form".
  */
 function makeLockerForm() {
   // Iterate Through Links and Find Locker Form
