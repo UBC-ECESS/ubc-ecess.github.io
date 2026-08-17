@@ -14,6 +14,7 @@
  * This Script Transforms Sensitive Data Into a Minimal Public Interface:
  * Private Columns (Excluded): name, email, notes, action, status, serial, combo, student number, discord username
  * Public Columns (Exposed): Set, Number, Taken
+ * Taken is TRUE when status is Reserved, ECESS, or action required.
  */
 
 const LOCKER_SHEET_ID = "1RYP-CQd0NlMrBrDnOi18g7F3P7Vjxx18tyVZRqNymfY";
@@ -57,7 +58,8 @@ function syncLockersToDB() {
       const lockerNumber = parseInt(lockerNum);
       let setName = `Floor ${Math.floor(lockerNumber / 100)}`;
 
-      const taken = (status === "Reserved" || status === "ECESS");
+      const takenStatus = String(status).trim().toLowerCase();
+      const taken = takenStatus === "reserved" || takenStatus === "ecess" || takenStatus === "action required";
       transformedData.push([setName, lockerNumber, taken]);
     }
 

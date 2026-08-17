@@ -39,6 +39,9 @@ const LOCKER_SECTIONS = {
 
 let visibleFloors = [];
 let currentFloorIdx = 0;
+let selectedLocker = null;
+let lockerFormTemplate = "";
+let lockerFormEntry = "";
 
 /*
  * Returns Taken Status for One Locker Number in a Set.
@@ -102,7 +105,11 @@ function makeSectionGrid(setName, start, end, floorUnavailable) {
       let status = "available";
       if (floorUnavailable || taken == null || taken == true) status = "taken";
 
-      html += `<div class="locker-cell ${status}">${number}</div>`;
+      if (status == "available") {
+        html += `<button type="button" class="locker-cell available${selectedLocker == number ? " selected" : ""}" data-locker="${number}" aria-pressed="${selectedLocker == number ? "true" : "false"}">${number}</button>`;
+      } else {
+        html += `<div class="locker-cell taken">${number}</div>`;
+      }
     }
   }
 
@@ -204,7 +211,7 @@ function renderFloorLayout() {
   html += `</div>`;
 
   html += `<ul class="locker-legend">`;
-  html += `<li><span class="locker-cell available"></span>Available</li>`;
+  html += `<li><span class="locker-cell available"></span>Available — click to copy the number</li>`;
   html += `<li><span class="locker-cell taken"></span>Taken</li>`;
   html += `</ul>`;
 
@@ -242,29 +249,163 @@ function bindFloorLayout() {
       renderFloorLayout();
     }
   });
+
+  document.querySelectorAll(".locker-cell.available[data-locker]").forEach((cell) => {
+    cell.addEventListener("click", () => {
+      selectLocker(Number(cell.getAttribute("data-locker")));
+    });
+  });
+}
+
+/*
+ * Marks a Numbered Cell as the Locker Being Signed Up For.
+ * Copies the Number so It Can Be Pasted into the Google Form.
+ */
+function selectLocker(number) {
+  selectedLocker = number;
+  document.querySelectorAll(".locker-cell.available[data-locker]").forEach((cell) => {
+    const isSelected = Number(cell.getAttribute("data-locker")) == number;
+    cell.classList.toggle("selected", isSelected);
+    cell.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+  showSelectedLocker(number);
+  copyLockerNumber(number);
+  if (formCanPrefill()) {
+    applyLockerFormPrefill(number);
+  }
+  document.getElementById("locker-form").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function showSelectedLocker(number) {
+  const label = document.getElementById("locker-selected-label");
+  const bar = document.getElementById("locker-copy-bar");
+  const value = document.getElementById("locker-copy-number");
+  if (value) value.textContent = number == null ? "" : String(number);
+  if (bar) bar.hidden = number == null;
+  if (label) {
+    if (number == null) {
+      label.textContent = "Click an available locker above, then paste its number into the form.";
+    } else if (formCanPrefill()) {
+      label.textContent = `Locker ${number} is filled in on the form below.`;
+    } else {
+      label.textContent = `Locker ${number} is copied. Paste it into the locker number field on the form.`;
+    }
+  }
+}
+
+function copyLockerNumber(number) {
+  const text = String(number);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    return;
+  }
+  const input = document.createElement("input");
+  input.value = text;
+  document.body.appendChild(input);
+  input.select();
+  try {
+    document.execCommand("copy");
+  } catch (error) {
+    // Ignore; the number is still shown on the page.
+  }
+  input.remove();
+}
+
+/*
+ * Builds an Embedded Form URL with the Selected Locker Pre-Filled.
+ * Supports {locker} in the Links URL, a "Locker Form Entry" ID, or a
+ * Pre-Filled Link that Contains One entry.XXXX= Value.
+ */
+function embedFormUrl(url, locker) {
+  let next = String(url || "");
+  const value = locker == null ? "" : String(locker);
+
+  next = next.split("{locker}").join(encodeURIComponent(value));
+  next = next.split("%7Blocker%7D").join(encodeURIComponent(value));
+  next = next.split("%7blocker%7d").join(encodeURIComponent(value));
+
+  if (lockerFormEntry) {
+    next = setFormEntry(next, lockerFormEntry, value);
+  } else {
+    next = replacePrefillEntry(next, value);
+  }
+
+  if (next.indexOf("/viewform") > -1 && next.indexOf("embedded=") < 0) {
+    next += (next.indexOf("?") >= 0 ? "&" : "?") + "embedded=true";
+  }
+  return next;
+}
+
+function setFormEntry(url, entryId, value) {
+  const id = String(entryId).replace(/^entry\./, "").trim();
+  if (!id) return url;
+  const param = `entry.${id}`;
+  const assignment = `${param}=${encodeURIComponent(value)}`;
+  const pattern = new RegExp(param.replace(".", "\\.") + "=[^&]*");
+  if (pattern.test(url)) return url.replace(pattern, assignment);
+  return url + (url.indexOf("?") >= 0 ? "&" : "?") + assignment;
+}
+
+function replacePrefillEntry(url, value) {
+  const matches = Array.from(url.matchAll(/[?&](entry\.\d+)=([^&]*)/g));
+  if (matches.length == 0) return url;
+  if (matches.length == 1) {
+    return setFormEntry(url, matches[0][1], value);
+  }
+  const dummy = matches.find((match) => {
+    const current = decodeURIComponent(match[2] || "").toLowerCase();
+    return ["{locker}", "locker", "000", "999", "xxx"].indexOf(current) >= 0;
+  });
+  if (dummy) return setFormEntry(url, dummy[1], value);
+  return url;
+}
+
+function formCanPrefill() {
+  if (lockerFormEntry) return true;
+  if (lockerFormTemplate.indexOf("{locker}") >= 0) return true;
+  if (lockerFormTemplate.indexOf("%7Blocker%7D") >= 0) return true;
+  return /[?&]entry\.\d+=/.test(lockerFormTemplate);
+}
+
+function applyLockerFormPrefill(locker) {
+  const frame = document.getElementById("locker-form-frame");
+  if (!frame || !lockerFormTemplate) return;
+  frame.src = embedFormUrl(lockerFormTemplate, locker);
 }
 
 /*
  * Embeds the Locker Form from the Links Sheet Row Named "Locker Form".
+ * Optional Row "Locker Form Entry" Holds the Google Form entry.ID for Locker Number.
  */
 function makeLockerForm() {
   for (let i = 0; i < data.links.length; i++) {
-    if (
-      anyCellNull("links", i, ["name", "link"]) == true ||
-      getCell("links", i, "show") == false ||
-      String(getCell("links", i, "name")).trim() != "Locker Form"
-    ) {
+    if (anyCellNull("links", i, ["name", "link"]) == true || getCell("links", i, "show") == false) {
       continue;
     }
-
-    let formUrl = getCell("links", i, "link");
-    if (formUrl.indexOf("/viewform") > -1) {
-      formUrl = formUrl.split("?")[0] + "?embedded=true";
+    const name = String(getCell("links", i, "name")).trim();
+    const link = String(getCell("links", i, "link")).trim();
+    if (name == "Locker Form Entry") {
+      lockerFormEntry = link.replace(/^entry\./, "");
     }
+    if (name == "Locker Form") {
+      lockerFormTemplate = link;
+    }
+  }
 
-    document.getElementById("locker-form-frame").src = formUrl;
-    document.getElementById("locker-form").style.display = "";
-    break;
+  if (!lockerFormTemplate) return;
+  applyLockerFormPrefill(selectedLocker);
+  document.getElementById("locker-form").style.display = "";
+  const copyBtn = document.getElementById("locker-copy-btn");
+  if (copyBtn && !copyBtn.dataset.bound) {
+    copyBtn.dataset.bound = "true";
+    copyBtn.addEventListener("click", () => {
+      if (selectedLocker == null) return;
+      copyLockerNumber(selectedLocker);
+      const label = document.getElementById("locker-selected-label");
+      if (label) {
+        label.textContent = `Locker ${selectedLocker} is copied. Paste it into the locker number field on the form.`;
+      }
+    });
   }
 }
 
