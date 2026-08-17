@@ -95,9 +95,9 @@ function makeMerch() {
       if (stock[0] == "0" || stock[0] == "") {
         html += '<div class="status out-of-stock">Out of stock</div>';
       } else if (Number(stock[0]) < 11) {
-        html += `<div class="status running-low">Only ${stock[0]} left!</div>`;
+        html += `<div class="status running-low">Only ${stock[0]} Left!</div>`;
       } else {
-        html += '<div class="status in-stock">In stock</div>';
+        html += '<div class="status in-stock">In Stock</div>';
       }
     }
     html += "</div>";
