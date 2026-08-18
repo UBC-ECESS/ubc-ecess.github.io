@@ -25,33 +25,18 @@ const MARQUEE_COMPANIES = [
   { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg" },
 ];
 
-const STATIC_LOGOS = window.matchMedia(
-  "(max-width: 1130px), (prefers-reduced-motion: reduce)",
-);
-
-function logoItem(company, hidden) {
+function logoItem(company) {
   return (
-    `<div class="alumni-logo"${hidden ? ' aria-hidden="true"' : ""}>` +
-    `<img src="${company.logo}" alt="${hidden ? "" : company.name}"></div>`
+    `<div class="alumni-logo">` +
+    `<img src="${company.logo}" alt="${company.name}"></div>`
   );
 }
 
 function makeAlumniLogos() {
   const root = document.getElementById("alumni-logos");
   if (!root) return;
-
-  if (STATIC_LOGOS.matches) {
-    root.className = "alumni-logo-grid";
-    root.innerHTML = MARQUEE_COMPANIES.map((c) => logoItem(c, false)).join("");
-    return;
-  }
-
-  root.className = "marquee-outer";
-  root.innerHTML =
-    `<div class="marquee-track">` +
-    MARQUEE_COMPANIES.map((c) => logoItem(c, false)).join("") +
-    MARQUEE_COMPANIES.map((c) => logoItem(c, true)).join("") +
-    `</div>`;
+  root.className = "alumni-logo-grid";
+  root.innerHTML = MARQUEE_COMPANIES.map(logoItem).join("");
 }
 
 // SPONSORS
@@ -127,9 +112,6 @@ function makeSponsors() {
 window.addEventListener("DOMContentLoaded", () => {
   commonInit();
   makeAlumniLogos();
-  if (STATIC_LOGOS.addEventListener) {
-    STATIC_LOGOS.addEventListener("change", makeAlumniLogos);
-  }
   fetchSheet("socials", makeSocials);
   fetchSheets(["contacts", "positions", "sponsors"], makeSponsors);
 });

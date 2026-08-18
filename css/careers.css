@@ -4,10 +4,9 @@
 	width: var(--inner-width);
 	max-width: 100%;
 	margin-inline: auto;
-	padding: 1rem 0 2rem;
+	padding: 1rem 0 0.5rem;
 	text-align: center;
 	box-sizing: border-box;
-	overflow: hidden;
 }
 
 #alumni-marquee h2 {
@@ -24,12 +23,26 @@
 	}
 }
 
+.alumni-logo-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	align-items: center;
+	justify-items: center;
+	gap: 1.25rem 1.5rem;
+	width: 100%;
+	padding: 0.5rem 0.75rem 0;
+	box-sizing: border-box;
+}
+
 .alumni-logo {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	width: 100%;
+	height: 48px;
 	min-width: 0;
-	opacity: 0.7;
+	min-height: 0;
+	opacity: 0.75;
 	transition: opacity 0.2s ease;
 }
 
@@ -39,74 +52,10 @@
 
 .alumni-logo img {
 	display: block;
+	height: 36px;
 	width: auto;
-	height: auto;
-	max-width: 100%;
-	max-height: 40px;
+	max-width: 140px;
 	object-fit: contain;
-}
-
-.alumni-logo-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	align-items: center;
-	justify-items: center;
-	gap: 1.5rem 1.25rem;
-	width: 100%;
-	padding: 0.5rem 0.75rem 0;
-	box-sizing: border-box;
-}
-
-.alumni-logo-grid .alumni-logo {
-	width: 100%;
-	height: 48px;
-	opacity: 0.8;
-}
-
-.alumni-logo-grid .alumni-logo img {
-	max-height: 32px;
-	max-width: 90%;
-}
-
-.marquee-outer {
-	overflow: hidden;
-	width: 100%;
-	mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-	-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-
-.marquee-track {
-	display: flex;
-	align-items: center;
-	gap: 5rem;
-	width: max-content;
-	animation: marquee-scroll 30s linear infinite;
-}
-
-.marquee-outer:hover .marquee-track {
-	animation-play-state: paused;
-}
-
-.marquee-track .alumni-logo {
-	flex-shrink: 0;
-	height: 48px;
-	opacity: 0.55;
-}
-
-.marquee-track .alumni-logo img {
-	max-height: 48px;
-	max-width: 160px;
-}
-
-@keyframes marquee-scroll {
-	from { transform: translateX(0); }
-	to { transform: translateX(-50%); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.marquee-track {
-		animation: none;
-	}
 }
 
 /* SPONSORS */
