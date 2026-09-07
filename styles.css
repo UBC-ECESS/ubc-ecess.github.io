@@ -959,3 +959,13 @@ form option {
 form .button {
 	width: 100%;
 }
+
+.button:disabled,
+.button:disabled:hover,
+.button.important:disabled,
+.button.important:disabled:hover {
+	opacity: 0.45;
+	cursor: not-allowed;
+	background-color: var(--secondary);
+	color: var(--text);
+}

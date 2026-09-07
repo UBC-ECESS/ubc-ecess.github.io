@@ -15,6 +15,8 @@
 
 #lockers {
 	width: var(--grid-width);
+	max-width: 100%;
+	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: repeat(var(--grid-columns), 1fr);
 	column-gap: var(--grid-col-gap);
@@ -120,17 +122,49 @@
 }
 
 #locker-detail {
-	width: var(--grid-width);
-	margin: var(--grid-margin-top) auto 1rem auto;
+	width: min(var(--grid-width), 100%);
+	max-width: 100%;
+	box-sizing: border-box;
+	margin: 1.25rem auto 1rem auto;
+	padding: 0 1rem;
+	overflow-x: hidden;
 }
 
 .locker-detail-bar {
 	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
+	flex-direction: column;
+	align-items: stretch;
 	gap: var(--gap-width);
 	margin-bottom: 1rem;
+}
+
+.locker-detail-nav {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	min-height: var(--standard-height);
+}
+
+#locker-back {
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: auto;
+}
+
+.locker-detail-status {
+	width: 100%;
+}
+
+.locker-detail-status .availability {
+	width: 100%;
+	flex-grow: 0;
+	box-sizing: border-box;
+	justify-content: center;
+	text-align: center;
+	margin: 0;
 }
 
 .floor-switcher {
@@ -150,28 +184,48 @@
 }
 
 .locker-sections {
+	--locker-cols: 11;
+	--locker-gap: 6px;
+	--locker-cell-size: 36px;
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	align-items: center;
+	gap: 1.25rem;
+	width: 100%;
+}
+
+.locker-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
 }
 
 .locker-section h3 {
-	margin: 0 0 var(--gap-width) 0;
+	margin: 0 0 0.45rem 0;
 	font-size: var(--h5-size);
+	text-align: center;
 }
 
 .locker-grid {
+	--section-cols: 1;
 	display: grid;
-	gap: var(--gap-width);
+	grid-template-columns: repeat(var(--section-cols), var(--locker-cell-size));
+	gap: var(--locker-gap);
+	justify-content: center;
 }
 
 .locker-cell {
-	min-height: 2.4rem;
+	width: var(--locker-cell-size);
+	height: var(--locker-cell-size);
+	min-width: 0;
+	min-height: 0;
+	box-sizing: border-box;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: var(--border-radius);
-	font-size: var(--nav-size);
+	border-radius: 6px;
+	font-size: min(var(--nav-size), calc(var(--locker-cell-size) * 0.34));
 	font-weight: 600;
 	border: none;
 	padding: 0;
@@ -179,25 +233,9 @@
 	color: inherit;
 }
 
-button.locker-cell.available {
-	cursor: pointer;
-}
-
-button.locker-cell.available:hover,
-button.locker-cell.available:focus-visible {
-	filter: brightness(1.08);
-	outline: 2px solid var(--primary-20);
-	outline-offset: 2px;
-}
-
 .locker-cell.available {
 	background-color: var(--green);
 	color: var(--text-alt);
-}
-
-.locker-cell.available.selected {
-	background-color: var(--primary-20);
-	box-shadow: 0 0 0 3px var(--primary-40);
 }
 
 .locker-cell.taken {
@@ -227,7 +265,10 @@ button.locker-cell.available:focus-visible {
 
 .locker-legend .locker-cell {
 	width: 1.2rem;
+	height: 1.2rem;
 	min-height: 1.2rem;
+	aspect-ratio: auto;
+	flex: 0 0 1.2rem;
 }
 
 #locker-form {
@@ -236,26 +277,55 @@ button.locker-cell.available:focus-visible {
 }
 
 #locker-form h2,
-#locker-selected-label {
+#locker-form-note {
 	max-width: 720px;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-#locker-copy-bar {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	gap: var(--gap-width);
-	margin: 0 0 1rem 0;
+@media (max-width: 1130px) {
+	#locker-detail,
+	#lockers {
+		width: 100%;
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+
+	#locker-detail {
+		margin-top: 0.75rem;
+	}
+
+	.locker-card-meta {
+		flex-wrap: wrap;
+	}
+
+	.locker .info,
+	.availability,
+	.locker .unavailable {
+		white-space: normal;
+		text-align: center;
+	}
+
+	.floor-switcher {
+		justify-content: center;
+	}
+
+	.locker-sections {
+		--locker-gap: 4px;
+		gap: 1rem;
+	}
 }
 
-#locker-copy-bar[hidden] {
-	display: none;
-}
+@media (max-width: 600px) {
+	#lockers {
+		width: 100%;
+	}
 
-#locker-copy-number {
-	font-size: var(--h4-size);
-	color: var(--primary-20);
+	#locker-detail {
+		width: 100%;
+	}
+
+	.locker-section h3 {
+		font-size: var(--nav-size);
+	}
 }

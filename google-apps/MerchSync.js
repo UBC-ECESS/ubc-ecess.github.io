@@ -150,10 +150,8 @@ function syncMerchToDB() {
  */
 function installMerchSyncTrigger() {
   try {
-    // Remove Existing Triggers to Avoid Duplicates
-    ScriptApp.getProjectTriggers().forEach(trigger => {
-      ScriptApp.deleteTrigger(trigger);
-    });
+    // Remove Only This Script's Trigger (Locker / Calendar Triggers Share the Project)
+    removeMerchSyncTrigger();
 
     // Create New Trigger: Runs Every 24 Hours
     ScriptApp.newTrigger("syncMerchToDB")
