@@ -44,7 +44,7 @@ Recommended first-time setup for each script:
 | File | Purpose | Canonical Entry Points |
 |---|---|---|
 | `helpers.js` | Shared `DB_SHEET_ID` for the public Website Database spreadsheet | — |
-| `LockerSync.js` | Locker sync script for private `Main` -> public `Lockers` | `syncLockersToDB()`, `testLockerSync()`, `installLockerSyncTrigger()`, `removeLockerSyncTrigger()` |
+| `LockerSync.js` | Locker sync script for private `Main` -> public `Lockers` (Daily + On Edit) | `syncLockersToDB()`, `testLockerSync()`, `installLockerSyncTrigger()`, `removeLockerSyncTrigger()` |
 | `MerchSync.js` | Merch sync script for private `Summary` -> public `Merch` stock | `syncMerchToDB()`, `testMerchSync()`, `installMerchSyncTrigger()`, `removeMerchSyncTrigger()` |
 | `CalendarSync.js` | Calendar sync script for Google Calendar -> public `Events` | `syncCalendarToDB()`, `testCalendarSync()`, `installCalendarSyncTrigger()`, `removeCalendarSyncTrigger()` |
 
@@ -64,8 +64,8 @@ Recommended first-time setup for each script:
 |---|---|---|
 | Test Sync | Run `testLockerSync()` | Runs locker sync immediately and validates permissions/config. |
 | Run Sync Now | Run `syncLockersToDB()` | Runs locker sync immediately without modifying triggers. |
-| Enable Auto-Sync | Run `installLockerSyncTrigger()` | Installs a daily trigger after test sync succeeds. |
-| Disable Auto-Sync | Run `removeLockerSyncTrigger()` | Removes locker auto-sync trigger(s). |
+| Enable Auto-Sync | Run `installLockerSyncTrigger()` | Installs a daily sync plus an on-edit sync on the private sheet. |
+| Disable Auto-Sync | Run `removeLockerSyncTrigger()` | Removes locker triggers only. |
 
 ### Locker Data Transformations
 
@@ -83,6 +83,8 @@ Locker sync maps private sheet fields to public fields as follows.
 
 Private columns like name, email, combo, student number, and notes are not copied.
 
+The on-edit trigger re-syncs within 15 s of any edit to the `Main` sheet. The daily trigger is a safety net.
+
 ### Locker Troubleshooting
 
 **No `Lockers` Updates in Public Sheet**
@@ -94,6 +96,10 @@ Private columns like name, email, combo, student number, and notes are not copie
 **Missing Column Error for locker or status**
 1. Verify `Main` header names include `locker` and `status` exactly.
 2. If headers were renamed, update the `headers.indexOf(...)` lookups in locker script.
+
+**Map Lags Behind the Private Sheet**
+1. Confirm the `onLockerSheetEdit` trigger exists (Apps Script → Triggers). If not, run `installLockerSyncTrigger()`.
+2. Hard refresh; the page re-polls every 20 s, so a stale view should clear on its own.
 
 **Trigger Installed But Wrong Script Runs**
 1. Remove trigger with `removeLockerSyncTrigger()`.
@@ -230,5 +236,5 @@ When the image is present and downloadable, the script saves it to Drive and sto
 3. Verify the expected public spreadsheet row values changed.
 
 **Conflicts Between Sync Trigger Management**
-1. Keep locker, merch, and calendar scripts in separate Apps Script projects when possible.
-2. If sharing a single Apps Script project, verify each remove/install function only targets its own handler function.
+1. Ensure each `install*Trigger()` function deletes only their own handler's triggers.
+2. Ensure there aren't duplicate top-level function names across files in the shared project.

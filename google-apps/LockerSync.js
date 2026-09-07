@@ -83,14 +83,27 @@ function syncLockersToDB() {
 }
 
 /*
+ * Trigger: Editing Private Main Sheet. Debounced to 15 Seconds.
+ */
+function onLockerSheetEdit() {
+  const cache = CacheService.getScriptCache();
+  if (cache.get("locker-sync-recent")) return;
+  cache.put("locker-sync-recent", "1", 15);
+  syncLockersToDB();
+}
+
+/*
  * Installs Time-Based Trigger for Automatic Daily Sync.
- * Run to Set Up Automation. Removes Existing Triggers to Avoid Duplicates.
+ * Run to Set Up Automation. Removes Existing Locker Triggers to Avoid Duplicates.
  */
 function installLockerSyncTrigger() {
   try {
-    // Remove Existing Triggers to Avoid Duplicates
+    // Remove Existing Locker Triggers to Avoid Duplicates
     ScriptApp.getProjectTriggers().forEach(trigger => {
-      ScriptApp.deleteTrigger(trigger);
+      const handler = trigger.getHandlerFunction();
+      if (handler === "syncLockersToDB" || handler === "onLockerSheetEdit") {
+        ScriptApp.deleteTrigger(trigger);
+      }
     });
 
     // Create New Trigger: Runs Every 24 Hours
@@ -99,8 +112,14 @@ function installLockerSyncTrigger() {
       .everyDays(1)
       .create();
 
+    // Create New Trigger: Runs on Edit of Private Sheet
+    ScriptApp.newTrigger("onLockerSheetEdit")
+      .forSpreadsheet(LOCKER_SHEET_ID)
+      .onEdit()
+      .create();
+
     Logger.log("✓ Trigger Installed Successfully");
-    Logger.log("✓ syncLockersToDB() Will Run Automatically Every 24 Hours");
+    Logger.log("✓ syncLockersToDB() Will Run Automatically Every 24 Hours and on Edit");
 
   } catch (error) {
     Logger.log(`✗ Trigger Installation Failed: ${error.message}`);
@@ -113,7 +132,8 @@ function installLockerSyncTrigger() {
 function removeLockerSyncTrigger() {
   try {
     ScriptApp.getProjectTriggers().forEach(trigger => {
-      if (trigger.getHandlerFunction() === "syncLockersToDB") {
+      const handler = trigger.getHandlerFunction();
+      if (handler === "syncLockersToDB" || handler === "onLockerSheetEdit") {
         ScriptApp.deleteTrigger(trigger);
       }
     });

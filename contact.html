@@ -12,7 +12,7 @@
 	<link rel="icon" type="image/x-icon" href="favicon/favicon.ico" />
 	<link rel="manifest" href="favicon/manifest.webmanifest" />
 	<!-- STYLING -->
-	<link rel="stylesheet" href="styles.css?version=10" />
+	<link rel="stylesheet" href="styles.css?version=11" />
 	<link href="assets/css/fontawesome.css" rel="stylesheet" />
 	<link href="assets/css/solid.css" rel="stylesheet" />
 	<link href="assets/css/brands.css" rel="stylesheet" />
@@ -37,7 +37,7 @@
 				<input id="form-key" type="hidden" name="access_key">
 
 				<!-- OPTIONAL -->
-				<input id="form-subject" type="hidden" name="subject" value="Website Contact Message (General)">
+						<input id="form-subject" type="hidden" name="subject" value="Website Contact Message">
 				<input type="hidden" name="from_name">
 				<input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
@@ -62,17 +62,17 @@
 						<textarea id="message" name="message" rows="5" required></textarea>
 					</div>
 					<div style="flex: 1 0 30%;">
-						<select id="form-type"></select>
+						<select id="form-type" name="topic" required></select>
 					</div>
 					<div style="flex: 1 0 30%;">
-						<button id="send" type="submit" class="button important"><i
+						<button id="send" type="submit" class="button important" disabled><i
 								class="fa-solid fa-paper-plane"></i><span>Send</span></button>
 					</div>
 				</div>
 			</form>
 		</div>
 	</div>
-	<script type="module" src="js/contact.js"></script>
+	<script type="module" src="js/contact.js?version=4"></script>
 </body>
 
 </html>

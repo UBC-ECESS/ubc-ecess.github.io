@@ -20,7 +20,7 @@ Dynamic content is fetched from **Google Sheets** documents at runtime using the
 
 | Document | ID | Data |
 |---|---|---|
-| **Main Database** | [`17CjfpnlwCs6...`](https://docs.google.com/spreadsheets/d/17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A) | Events, Council, Contacts, Courses, Socials, Merch, Gallery, Sponsors, Lockers |
+| **Main Database** | [`17CjfpnlwCs6...`](https://docs.google.com/spreadsheets/d/17CjfpnlwCs6aKsXiT2DS-d8jX6Hk9tSPYcHhPP2nL2A) | Events, External, Council, Positions, Contacts, Courses, Course_Resources, Socials, Links, Merch, Categories, Gallery, Collections, Sponsors, Lockers, Sets |
 | **Games Log** | [`1u-wBWNxd7jE...`](https://docs.google.com/spreadsheets/d/1u-wBWNxd7jEW2euJwzaiinHMNy8S_QvJgzh0G9xjU98) | Leaderboard (Matches, Players, Games, Rating Parameters) |
 
 ### Integration
@@ -50,8 +50,6 @@ Most updates will only require editing the **Google Sheets**.
 | Add / Edit Event, Merch Item, Council Member, Course, Sponsor, etc. | Add / Edit in Main Database |
 | Hide / Show Row | Set `show` Col to `FALSE` / `TRUE` |
 | Record Leaderboard Match | Add Row to **Matches** Tab in Games Log |
-
-> Leaderboard ratings are calculated client-side on every page load.
 
 ### Updates - Code Base
 

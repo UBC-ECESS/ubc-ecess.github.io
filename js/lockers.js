@@ -1,11 +1,11 @@
 import {
   data,
   fetchSheet,
-  fetchSheets,
   getCell,
   anyCellNull,
   driveUrlToThumb,
   makeSocials,
+  makeSheetUrl,
   commonInit,
 } from "../app.js";
 
@@ -39,9 +39,59 @@ const LOCKER_SECTIONS = {
 
 let visibleFloors = [];
 let currentFloorIdx = 0;
-let selectedLocker = null;
 let lockerFormTemplate = "";
-let lockerFormEntry = "";
+let lockersReady = false;
+let availabilityTimer = null;
+let lockerResizeBound = false;
+let currentMaxCols = 11;
+const AVAILABILITY_POLL_MS = 60000;
+const LOCKER_CELL_MAX = 100;
+
+/*
+ * Redraws Cards / Floor Grid after Availability Data Changes.
+ */
+function renderLockers() {
+  if (!lockersReady || !data.sets || data.sets.length == 0) return;
+
+  makeLockers();
+  if (document.getElementById("locker-detail").style.display != "none") {
+    renderFloorLayout();
+  }
+}
+
+/*
+ * Parses a Google Sheets gviz Response into Rows.
+ */
+function rowsFromGviz(text) {
+  return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
+}
+
+/*
+ * Loads Fresh Taken/Free Data from the Public Lockers Sheet.
+ * Bypasses the localStorage Cache and Browser Cache so Assignments Show Up Quickly.
+ */
+function refreshLockerAvailability() {
+  const url = makeSheetUrl("lockers") + "&t=" + Date.now();
+
+  return fetch(url, { cache: "no-store" })
+    .then((res) => res.text())
+    .then((text) => {
+      data.lockers = rowsFromGviz(text);
+      lockersReady = true;
+      renderLockers();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+/*
+ * Re-Checks Availability So Taken Lockers Update Live.
+ */
+function startAvailabilityPolling() {
+  if (availabilityTimer) clearInterval(availabilityTimer);
+  availabilityTimer = setInterval(refreshLockerAvailability, AVAILABILITY_POLL_MS);
+}
 
 /*
  * Returns Taken Status for One Locker Number in a Set.
@@ -76,8 +126,74 @@ function countFreeLockers(setName) {
 }
 
 /*
+ * Counts How Many Columns a Section Needs (Half the Numbers, Rounded Up).
+ */
+function sectionColumnCount(start, end) {
+  return Math.ceil((end - start + 1) / 2);
+}
+
+/*
+ * Gap Between Locker Cells. Tighter on Small Screens.
+ */
+function lockerGapPx() {
+  if (window.matchMedia("(max-width: 600px)").matches) return 3;
+  if (window.matchMedia("(max-width: 1130px)").matches) return 4;
+  return 8;
+}
+
+/*
+ * Sets a Pixel Cell Size so the Widest Section Fills the Detail Width.
+ * Phones Use the Full Fit. Desktop Caps at LOCKER_CELL_MAX so Tiles
+ * Stay Large but Do Not Become Huge on Ultrawide Screens.
+ */
+function fitLockerGrids() {
+  const detail = document.getElementById("locker-detail");
+  const root = document.querySelector(".locker-sections");
+  if (!detail || !root || detail.style.display == "none") return;
+  const cols = currentMaxCols;
+  const gap = lockerGapPx();
+  const styles = getComputedStyle(detail);
+  const pad =
+    (parseFloat(styles.paddingLeft) || 0) +
+    (parseFloat(styles.paddingRight) || 0);
+  const width = detail.clientWidth - pad;
+  if (width < 20) return;
+  const fitted = Math.floor((width - (cols - 1) * gap) / cols);
+  const size = window.matchMedia("(max-width: 1130px)").matches
+    ? fitted
+    : Math.min(LOCKER_CELL_MAX, fitted);
+  if (size < 1) return;
+  root.style.setProperty("--locker-cols", String(cols));
+  root.style.setProperty("--locker-gap", gap + "px");
+  root.style.setProperty("--locker-cell-size", size + "px");
+}
+
+/*
+ * Scrolls the Floor View to Sit Just Below the Fixed Navbar.
+ */
+function scrollToLockerDetail() {
+  const detail = document.getElementById("locker-detail");
+  if (!detail) return;
+  const header = document.querySelector("header");
+  const navH = header ? header.offsetHeight : 65;
+  const top =
+    window.scrollY + detail.getBoundingClientRect().top - navH - 12;
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+}
+
+/*
+ * Re-Fits Grids after Rotate / Resize.
+ */
+function watchLockerResize() {
+  if (lockerResizeBound) return;
+  lockerResizeBound = true;
+  window.addEventListener("resize", fitLockerGrids);
+}
+
+/*
  * Builds a 2-High Grid for One Number Range.
  * Top Row Is Evens Descending; Bottom Row Is Odds Descending.
+ * Cells Use a Shared Size so Short Sections Do Not Stretch Wider.
  */
 function makeSectionGrid(setName, start, end, floorUnavailable) {
   const evens = [];
@@ -89,8 +205,8 @@ function makeSectionGrid(setName, start, end, floorUnavailable) {
 
   const columns = Math.max(evens.length, odds.length);
   let html = `<section class="locker-section">`;
-  html += `<h3>${start}–${end}</h3>`;
-  html += `<div class="locker-grid" style="grid-template-columns: repeat(${columns}, minmax(0, 1fr));">`;
+  html += `<h3>Section ${start}–${end}</h3>`;
+  html += `<div class="locker-grid" style="--section-cols: ${columns};">`;
 
   const rows = [evens, odds];
   for (let r = 0; r < rows.length; r++) {
@@ -105,11 +221,7 @@ function makeSectionGrid(setName, start, end, floorUnavailable) {
       let status = "available";
       if (floorUnavailable || taken == null || taken == true) status = "taken";
 
-      if (status == "available") {
-        html += `<button type="button" class="locker-cell available${selectedLocker == number ? " selected" : ""}" data-locker="${number}" aria-pressed="${selectedLocker == number ? "true" : "false"}">${number}</button>`;
-      } else {
-        html += `<div class="locker-cell taken">${number}</div>`;
-      }
+      html += `<div class="locker-cell ${status}">${number}</div>`;
     }
   }
 
@@ -172,8 +284,13 @@ function openFloorLayout(setIndex) {
   if (currentFloorIdx < 0) currentFloorIdx = 0;
   renderFloorLayout();
   document.getElementById("lockers").style.display = "none";
+  const intro = document.querySelector("#lockers-page .below-header");
+  if (intro) intro.style.display = "none";
   document.getElementById("locker-detail").style.display = "";
-  document.getElementById("locker-detail").scrollIntoView({ behavior: "smooth", block: "start" });
+  requestAnimationFrame(() => {
+    fitLockerGrids();
+    scrollToLockerDetail();
+  });
 }
 
 /*
@@ -182,6 +299,8 @@ function openFloorLayout(setIndex) {
 function closeFloorLayout() {
   document.getElementById("locker-detail").style.display = "none";
   document.getElementById("lockers").style.display = "";
+  const intro = document.querySelector("#lockers-page .below-header");
+  if (intro) intro.style.display = "";
 }
 
 /*
@@ -195,28 +314,39 @@ function renderFloorLayout() {
   const freeCount = countFreeLockers(name);
 
   let html = `<div class="locker-detail-bar">`;
+  html += `<div class="locker-detail-nav">`;
   html += `<button type="button" class="button" id="locker-back"><i class="fa-solid fa-arrow-left"></i>Back</button>`;
   html += `<div class="floor-switcher">`;
   html += `<button type="button" class="button icon" id="floor-prev" aria-label="Previous floor"${currentFloorIdx == 0 ? " disabled" : ""}><i class="fa-solid fa-chevron-left"></i></button>`;
   html += `<h2>${name} <span>/ ${visibleFloors.length}</span></h2>`;
   html += `<button type="button" class="button icon" id="floor-next" aria-label="Next floor"${currentFloorIdx == visibleFloors.length - 1 ? " disabled" : ""}><i class="fa-solid fa-chevron-right"></i></button>`;
   html += `</div>`;
+  html += `</div>`;
+  html += `<div class="locker-detail-status">`;
   html += `<span class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} Available</span>`;
   html += `</div>`;
+  html += `</div>`;
 
-  html += `<div class="locker-sections">`;
+  currentMaxCols = 1;
+  for (let i = 0; i < sections.length; i++) {
+    const cols = sectionColumnCount(sections[i].start, sections[i].end);
+    if (cols > currentMaxCols) currentMaxCols = cols;
+  }
+
+  html += `<div class="locker-sections" style="--locker-cols: ${currentMaxCols};">`;
   for (let i = 0; i < sections.length; i++) {
     html += makeSectionGrid(name, sections[i].start, sections[i].end, floorUnavailable);
   }
   html += `</div>`;
 
   html += `<ul class="locker-legend">`;
-  html += `<li><span class="locker-cell available"></span>Available — click to copy the number</li>`;
+  html += `<li><span class="locker-cell available"></span>Available</li>`;
   html += `<li><span class="locker-cell taken"></span>Taken</li>`;
   html += `</ul>`;
 
   document.getElementById("locker-detail").innerHTML = html;
   bindFloorLayout();
+  requestAnimationFrame(fitLockerGrids);
 }
 
 /*
@@ -249,133 +379,10 @@ function bindFloorLayout() {
       renderFloorLayout();
     }
   });
-
-  document.querySelectorAll(".locker-cell.available[data-locker]").forEach((cell) => {
-    cell.addEventListener("click", () => {
-      selectLocker(Number(cell.getAttribute("data-locker")));
-    });
-  });
-}
-
-/*
- * Marks a Numbered Cell as the Locker Being Signed Up For.
- * Copies the Number so It Can Be Pasted into the Google Form.
- */
-function selectLocker(number) {
-  selectedLocker = number;
-  document.querySelectorAll(".locker-cell.available[data-locker]").forEach((cell) => {
-    const isSelected = Number(cell.getAttribute("data-locker")) == number;
-    cell.classList.toggle("selected", isSelected);
-    cell.setAttribute("aria-pressed", isSelected ? "true" : "false");
-  });
-  showSelectedLocker(number);
-  copyLockerNumber(number);
-  if (formCanPrefill()) {
-    applyLockerFormPrefill(number);
-  }
-  document.getElementById("locker-form").scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function showSelectedLocker(number) {
-  const label = document.getElementById("locker-selected-label");
-  const bar = document.getElementById("locker-copy-bar");
-  const value = document.getElementById("locker-copy-number");
-  if (value) value.textContent = number == null ? "" : String(number);
-  if (bar) bar.hidden = number == null;
-  if (label) {
-    if (number == null) {
-      label.textContent = "Click an available locker above, then paste its number into the form.";
-    } else if (formCanPrefill()) {
-      label.textContent = `Locker ${number} is filled in on the form below.`;
-    } else {
-      label.textContent = `Locker ${number} is copied. Paste it into the locker number field on the form.`;
-    }
-  }
-}
-
-function copyLockerNumber(number) {
-  const text = String(number);
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).catch(() => {});
-    return;
-  }
-  const input = document.createElement("input");
-  input.value = text;
-  document.body.appendChild(input);
-  input.select();
-  try {
-    document.execCommand("copy");
-  } catch (error) {
-    // Ignore; the number is still shown on the page.
-  }
-  input.remove();
-}
-
-/*
- * Builds an Embedded Form URL with the Selected Locker Pre-Filled.
- * Supports {locker} in the Links URL, a "Locker Form Entry" ID, or a
- * Pre-Filled Link that Contains One entry.XXXX= Value.
- */
-function embedFormUrl(url, locker) {
-  let next = String(url || "");
-  const value = locker == null ? "" : String(locker);
-
-  next = next.split("{locker}").join(encodeURIComponent(value));
-  next = next.split("%7Blocker%7D").join(encodeURIComponent(value));
-  next = next.split("%7blocker%7d").join(encodeURIComponent(value));
-
-  if (lockerFormEntry) {
-    next = setFormEntry(next, lockerFormEntry, value);
-  } else {
-    next = replacePrefillEntry(next, value);
-  }
-
-  if (next.indexOf("/viewform") > -1 && next.indexOf("embedded=") < 0) {
-    next += (next.indexOf("?") >= 0 ? "&" : "?") + "embedded=true";
-  }
-  return next;
-}
-
-function setFormEntry(url, entryId, value) {
-  const id = String(entryId).replace(/^entry\./, "").trim();
-  if (!id) return url;
-  const param = `entry.${id}`;
-  const assignment = `${param}=${encodeURIComponent(value)}`;
-  const pattern = new RegExp(param.replace(".", "\\.") + "=[^&]*");
-  if (pattern.test(url)) return url.replace(pattern, assignment);
-  return url + (url.indexOf("?") >= 0 ? "&" : "?") + assignment;
-}
-
-function replacePrefillEntry(url, value) {
-  const matches = Array.from(url.matchAll(/[?&](entry\.\d+)=([^&]*)/g));
-  if (matches.length == 0) return url;
-  if (matches.length == 1) {
-    return setFormEntry(url, matches[0][1], value);
-  }
-  const dummy = matches.find((match) => {
-    const current = decodeURIComponent(match[2] || "").toLowerCase();
-    return ["{locker}", "locker", "000", "999", "xxx"].indexOf(current) >= 0;
-  });
-  if (dummy) return setFormEntry(url, dummy[1], value);
-  return url;
-}
-
-function formCanPrefill() {
-  if (lockerFormEntry) return true;
-  if (lockerFormTemplate.indexOf("{locker}") >= 0) return true;
-  if (lockerFormTemplate.indexOf("%7Blocker%7D") >= 0) return true;
-  return /[?&]entry\.\d+=/.test(lockerFormTemplate);
-}
-
-function applyLockerFormPrefill(locker) {
-  const frame = document.getElementById("locker-form-frame");
-  if (!frame || !lockerFormTemplate) return;
-  frame.src = embedFormUrl(lockerFormTemplate, locker);
 }
 
 /*
  * Embeds the Locker Form from the Links Sheet Row Named "Locker Form".
- * Optional Row "Locker Form Entry" Holds the Google Form entry.ID for Locker Number.
  */
 function makeLockerForm() {
   for (let i = 0; i < data.links.length; i++) {
@@ -384,34 +391,29 @@ function makeLockerForm() {
     }
     const name = String(getCell("links", i, "name")).trim();
     const link = String(getCell("links", i, "link")).trim();
-    if (name == "Locker Form Entry") {
-      lockerFormEntry = link.replace(/^entry\./, "");
-    }
     if (name == "Locker Form") {
       lockerFormTemplate = link;
     }
   }
 
   if (!lockerFormTemplate) return;
-  applyLockerFormPrefill(selectedLocker);
-  document.getElementById("locker-form").style.display = "";
-  const copyBtn = document.getElementById("locker-copy-btn");
-  if (copyBtn && !copyBtn.dataset.bound) {
-    copyBtn.dataset.bound = "true";
-    copyBtn.addEventListener("click", () => {
-      if (selectedLocker == null) return;
-      copyLockerNumber(selectedLocker);
-      const label = document.getElementById("locker-selected-label");
-      if (label) {
-        label.textContent = `Locker ${selectedLocker} is copied. Paste it into the locker number field on the form.`;
-      }
-    });
+  const frame = document.getElementById("locker-form-frame");
+  if (!frame) return;
+  let next = lockerFormTemplate;
+  if (next.indexOf("/viewform") > -1 && next.indexOf("embedded=") < 0) {
+    next += (next.indexOf("?") >= 0 ? "&" : "?") + "embedded=true";
   }
+  frame.src = next;
+  document.getElementById("locker-form").style.display = "";
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   commonInit();
+  watchLockerResize();
   fetchSheet("socials", makeSocials);
-  fetchSheet("links", makeLockerForm);
-  fetchSheets(["lockers", "sets"], makeLockers);
+  fetchSheet("links", () => {
+    makeLockerForm();
+    refreshLockerAvailability().then(startAvailabilityPolling);
+  });
+  fetchSheet("sets", renderLockers);
 });

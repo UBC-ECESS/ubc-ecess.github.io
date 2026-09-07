@@ -11,7 +11,7 @@ import {
 // CONTACT
 
 function makeContactOptions() {
-  let html = "";
+  let html = `<option value="" selected disabled>Select Topic</option>`;
   for (let i = 0; i < data.contacts.length; i++) {
     if (
       getCell("contacts", i, "option") == null ||
@@ -22,31 +22,28 @@ function makeContactOptions() {
     html += `<option value="${getCell("contacts", i, "option")}">${getCell("contacts", i, "option")}</option>`;
   }
 
-  let key;
-  for (let i = 0; i < data.positions.length; i++) {
-    if (
-      getCell("positions", i, "email") != null &&
-      getCell("contacts", 0, "email") == getCell("positions", i, "email")
-    ) {
-      key = getCell("positions", i, "key");
-      break;
-    }
-  }
-
-  document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
+  document.getElementById("form-key").setAttribute("value", "");
   document
     .getElementById("form-subject")
-    .setAttribute(
-      "value",
-      `Website Contact Message (${getCell("contacts", 0, "option")})`,
-    );
+    .setAttribute("value", "Website Contact Message");
 
   document.getElementById("form-type").innerHTML = html;
+  setSendEnabled(false);
+}
+
+function setSendEnabled(enabled) {
+  document.getElementById("send").disabled = !enabled;
 }
 
 function updateContactForm() {
   let selectObj = document.getElementById("form-type");
   let type = selectObj.options[selectObj.selectedIndex].value;
+  if (type == "") {
+    document.getElementById("form-key").setAttribute("value", "");
+    document.getElementById("form-subject").setAttribute("value", "Website Contact Message");
+    setSendEnabled(false);
+    return;
+  }
 
   let key;
   for (let i = 0; i < data.contacts.length; i++) {
@@ -81,6 +78,7 @@ function updateContactForm() {
 
   document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
   document.getElementById("form-subject").setAttribute("value", subject);
+  setSendEnabled(true);
 }
 
 window.addEventListener("DOMContentLoaded", () => {

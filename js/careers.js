@@ -25,6 +25,9 @@ const MARQUEE_COMPANIES = [
   { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg" },
 ];
 
+/*
+ * Builds One Alumni Logo Cell
+ */
 function logoItem(company) {
   return (
     `<div class="alumni-logo">` +
@@ -32,6 +35,9 @@ function logoItem(company) {
   );
 }
 
+/*
+ * Renders the Alumni Logo Grid from MARQUEE_COMPANIES
+ */
 function makeAlumniLogos() {
   const root = document.getElementById("alumni-logos");
   if (!root) return;
@@ -39,8 +45,49 @@ function makeAlumniLogos() {
   root.innerHTML = MARQUEE_COMPANIES.map(logoItem).join("");
 }
 
+/*
+ * Returns the Contacts Row Index for a Named Option, or -1 if Missing
+ */
+function findContactIndex(option) {
+  for (let i = 0; i < data.contacts.length; i++) {
+    if (getCell("contacts", i, "option") == option) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/*
+ * Looks Up the Web3Forms Access Key for a Contacts Row
+ * Prefers Override Email, Then Regular Email, Then the First Contact
+ */
+function getContactKey(contactIdx) {
+  if (contactIdx < 0) {
+    return "";
+  }
+  let searchEmail =
+    getCell("contacts", contactIdx, "override") != null
+      ? getCell("contacts", contactIdx, "override")
+      : getCell("contacts", contactIdx, "email") != null
+        ? getCell("contacts", contactIdx, "email")
+        : getCell("contacts", 0, "email"); // Prefer Override, Then Regular Email, Then First Contact
+  for (let j = 0; j < data.positions.length; j++) {
+    if (getCell("positions", j, "email") == searchEmail) {
+      let key =
+        getCell("positions", j, "key") != null
+          ? getCell("positions", j, "key")
+          : getCell("positions", 0, "key"); // Fall Back to First Position Key
+      return key?.trim() ?? "";
+    }
+  }
+  return "";
+}
+
 // SPONSORS
 
+/*
+ * Fills the Sponsorship Package, Contact Form Key, and Sponsor Tiers
+ */
 function makeSponsors() {
   document
     .getElementById("package")
@@ -51,28 +98,14 @@ function makeSponsors() {
       ),
     );
 
-  let key = "";
-  for (let i = 0; i < data.contacts.length; i++) {
-    if (getCell("contacts", i, "option") == "Sponsorship") {
-      let searchEmail =
-        getCell("contacts", i, "override") != null
-          ? getCell("contacts", i, "override")
-          : getCell("contacts", i, "email") != null
-            ? getCell("contacts", i, "email")
-            : getCell("contacts", 0, "email");
-      for (let j = 0; j < data.positions.length; j++) {
-        if (getCell("positions", j, "email") == searchEmail) {
-          key =
-            getCell("positions", j, "key") != null
-              ? getCell("positions", j, "key")
-              : getCell("positions", 0, "key");
-          break;
-        }
-      }
-      break;
-    }
+  // Use Sponsorship If Present, Otherwise General
+  let contactIdx = findContactIndex("Sponsorship");
+  if (contactIdx < 0) {
+    contactIdx = findContactIndex("General");
   }
-  document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
+  document
+    .getElementById("form-key")
+    .setAttribute("value", getContactKey(contactIdx));
 
   let html = "";
   let tiers = ["Titanium", "Steel", "Iron", "Aluminum"];
