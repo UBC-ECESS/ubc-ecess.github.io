@@ -25,6 +25,9 @@ const MARQUEE_COMPANIES = [
   { name: "Sanctuary AI", logo: "media/logos/sanctuary-ai.svg" },
 ];
 
+let alumniResizeBound = false;
+let alumniResizeTimer = null;
+
 /*
  * Builds One Alumni Logo Cell
  */
@@ -36,13 +39,50 @@ function logoItem(company) {
 }
 
 /*
- * Renders the Alumni Logo Grid from MARQUEE_COMPANIES
+ * Renders a Continuous Alumni Logo Wheel.
+ * Duplicates the Set so translateX(-50%) Loops with No Jump
  */
 function makeAlumniLogos() {
   const root = document.getElementById("alumni-logos");
   if (!root) return;
-  root.className = "alumni-logo-grid";
-  root.innerHTML = MARQUEE_COMPANIES.map(logoItem).join("");
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    root.className = "alumni-logo-grid";
+    root.innerHTML = MARQUEE_COMPANIES.map(logoItem).join("");
+    return;
+  }
+
+  const items = MARQUEE_COMPANIES.map(logoItem).join("");
+  root.className = "alumni-logo-track";
+
+  const strip = document.createElement("div");
+  strip.className = "alumni-logo-strip";
+
+  const group = document.createElement("div");
+  group.className = "alumni-logo-group";
+  group.innerHTML = items;
+  strip.appendChild(group);
+  root.replaceChildren(strip);
+
+  let copies = 0;
+  while (group.scrollWidth < root.clientWidth && copies < 8) {
+    group.insertAdjacentHTML("beforeend", items);
+    copies++;
+  }
+
+  const clone = group.cloneNode(true);
+  clone.setAttribute("aria-hidden", "true");
+  strip.appendChild(clone);
+
+  strip.style.animationDuration = group.scrollWidth / 45 + "s";
+
+  if (!alumniResizeBound) {
+    alumniResizeBound = true;
+    window.addEventListener("resize", () => {
+      clearTimeout(alumniResizeTimer);
+      alumniResizeTimer = setTimeout(makeAlumniLogos, 150);
+    });
+  }
 }
 
 /*
