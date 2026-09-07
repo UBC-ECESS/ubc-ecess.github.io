@@ -73,6 +73,20 @@ export const SHEETS = {
     DOC: DATABASE_DOC,
     COLS: ["name", "link", "logo", "tier", "show"],
   },
+  external: {
+    SHEET: "External",
+    DOC: DATABASE_DOC,
+    COLS: [
+      "date",
+      "expiry",
+      "name",
+      "description",
+      "location",
+      "link",
+      "image",
+      "show",
+    ],
+  },
   courses: {
     SHEET: "Courses",
     DOC: DATABASE_DOC,
@@ -544,7 +558,7 @@ export function handleTooltips(el) {
 
 export function driveUrlToThumb(url) {
   url = String(url);
-  return `https://drive.google.com/thumbnail?id=${url.substring(url.indexOf("/d/") + 3, url.indexOf("/view"))}&sz=w1080`;
+  return `https://lh3.googleusercontent.com/d/${url.substring(url.indexOf("/d/") + 3, url.indexOf("/view"))}=w1080`;
 }
 
 export function driveUrlToPreview(url) {
