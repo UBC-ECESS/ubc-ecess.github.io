@@ -34,6 +34,42 @@
 	box-sizing: border-box;
 }
 
+.alumni-logo-track {
+	overflow: hidden;
+	width: 100%;
+	padding: 0.5rem 0 0;
+	box-sizing: border-box;
+	-webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+	mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.alumni-logo-strip {
+	display: flex;
+	width: max-content;
+	animation-name: alumni-marquee;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+.alumni-logo-track:hover .alumni-logo-strip {
+	animation-play-state: paused;
+}
+
+.alumni-logo-group {
+	display: flex;
+	align-items: center;
+}
+
+@keyframes alumni-marquee {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(-50%);
+	}
+}
+
 .alumni-logo {
 	display: flex;
 	align-items: center;
@@ -44,6 +80,11 @@
 	min-height: 0;
 	opacity: 0.75;
 	transition: opacity 0.2s ease;
+}
+
+.alumni-logo-track .alumni-logo {
+	flex: 0 0 auto;
+	width: 160px;
 }
 
 .alumni-logo:hover {
