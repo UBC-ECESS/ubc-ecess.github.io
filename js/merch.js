@@ -32,7 +32,7 @@ function sizeList(counts, labels) {
 function stockLine(count) {
   if (count === "0" || count === "") return '<div class="status out-of-stock">Out of stock</div>';
   if (Number(count) < 11) return `<div class="status running-low">Only ${count} left</div>`;
-  return '<div class="status in-stock">In stock</div>';
+  return '<div class="status in-stock">In Stock</div>';
 }
 
 function paintCategories() {
