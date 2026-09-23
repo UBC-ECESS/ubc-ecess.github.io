@@ -52,7 +52,7 @@
 	--line-xl: calc(1em * var(--leading) + 2 * var(--pad-xl-v));
 
 	/* variables */
-	--bar-height: 68px;
+	--bar-height: 84px;
 	--hero-height: 220px;
 	--measure: clamp(30vw, 1500px, 85vw);
 	--frame: clamp(60vw, 1700px, 85vw);
@@ -143,7 +143,7 @@
 @media (max-width: 600px) {
 	:root {
 		--scale: 1.22;
-		--bar-height: 65px;
+		--bar-height: 76px;
 		--hero-height: 160px;
 		--measure: 90%;
 	}
@@ -268,14 +268,15 @@ header {
 
 .logo {
 	object-fit: contain;
-	height: calc(var(--bar-height) - 1.75rem);
+	height: calc(var(--bar-height) - 0.7rem);
 	position: static;
 	flex: 0 0 auto;
 }
 
 .logo img {
-	max-height: 100%;
-	max-width: 100%;
+	display: block;
+	height: 100%;
+	width: auto;
 }
 
 .brand {
@@ -460,7 +461,7 @@ header nav .button.nav {
 	border-radius: 0;
 	color: var(--paper);
 	font-family: 'IBM Plex Mono', ui-monospace, monospace;
-	font-size: var(--label-size);
+	font-size: var(--text-size);
 	font-weight: 500;
 	text-decoration: none;
 	padding: 0.35em 0.55em;
