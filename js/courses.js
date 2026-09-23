@@ -1,14 +1,23 @@
 import {
-  data,
-  POP_IN_DELAY,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  makeSocials,
-  addButtonEvents,
-  commonInit,
-} from "../app.js";
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
 
 /*
  * Parses Course Code to Extract Year-Level
@@ -35,25 +44,25 @@ const RESOURCE_TYPES = {
 function makeCourses() {
   // Build Map of Course Code to Resources from Course_Resources Sheet
   const resourcesByCode = new Map();
-  for (let i = 0; i < data.course_resources.length; i++) {
-    if (anyCellNull("course_resources", i, ["code", "link"])) continue;
-    if (getCell("course_resources", i, "show") == false) continue;
-    const code = String(getCell("course_resources", i, "code")).trim();
+  for (let i = 0; i < rows("course_resources").length; i++) {
+    if (lacks(rows("course_resources")[i], ["code", "link"])) continue;
+    if (field(rows("course_resources")[i], "show") == false) continue;
+    const code = String(field(rows("course_resources")[i], "code")).trim();
     if (!resourcesByCode.has(code)) resourcesByCode.set(code, []);
     resourcesByCode.get(code).push({
-      link: getCell("course_resources", i, "link"),
-      type: getCell("course_resources", i, "type"),
+      link: field(rows("course_resources")[i], "link"),
+      type: field(rows("course_resources")[i], "type"),
     });
   }
 
   // Collect unique year-levels for filter buttons
   let levelsSet = new Set();
-  for (let i = 0; i < data.courses.length; i++) {
+  for (let i = 0; i < rows("courses").length; i++) {
     if (
-      anyCellNull("courses", i, ["code", "name"]) ||
-      getCell("courses", i, "show") == false
+      lacks(rows("courses")[i], ["code", "name"]) ||
+      field(rows("courses")[i], "show") == false
     ) continue;
-    const level = parseYear(getCell("courses", i, "code"));
+    const level = parseYear(field(rows("courses")[i], "code"));
     if (level != null) levelsSet.add(level);
   }
 
@@ -80,17 +89,17 @@ function makeCourses() {
   let html = "";
   let idx = 0;
 
-  for (let i = 0; i < data.courses.length; i++) {
+  for (let i = 0; i < rows("courses").length; i++) {
     if (
-      anyCellNull("courses", i, ["code", "name"]) ||
-      getCell("courses", i, "show") == false
+      lacks(rows("courses")[i], ["code", "name"]) ||
+      field(rows("courses")[i], "show") == false
     ) continue;
 
-    const code = String(getCell("courses", i, "code")).trim();
-    const name = getCell("courses", i, "name");
+    const code = String(field(rows("courses")[i], "code")).trim();
+    const name = field(rows("courses")[i], "name");
     const level = parseYear(code);
 
-    html += `<li class="course-item${level != null ? ` year-${level}` : ""}" style="animation-delay: ${idx * POP_IN_DELAY}ms;">`;
+    html += `<li class="course-item${level != null ? ` year-${level}` : ""}">`;
     if (level != null) html += `<div class="year-badge">${level}-Level</div>`;
     html += `<h2>${code}</h2>`;
     html += `<h3>${name}</h3>`;
@@ -113,11 +122,11 @@ function makeCourses() {
   }
 
   if (idx === 0) {
-    html = `<li><div class="no-entries">No Courses Listed Yet...Check Back Soon!</div></li>`;
+    html = `<li><div class="empty-note">No Courses Listed Yet...Check Back Soon!</div></li>`;
   }
 
   document.getElementById("courses-grid").innerHTML = html;
-  addButtonEvents();
+  wireIcons();
 }
 
 function filterCourses(level) {
@@ -134,7 +143,6 @@ function filterCourses(level) {
     courseItems[i].style.display = "none";
     setTimeout(() => {
       if (level == null || courseItems[i].classList.contains(`year-${level}`)) {
-        courseItems[i].style = `animation-delay: ${i * POP_IN_DELAY}ms;`;
         courseItems[i].style.display = "";
       }
     }, 1);
@@ -142,7 +150,7 @@ function filterCourses(level) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
-  fetchSheet("socials", makeSocials);
-  fetchSheets(["courses", "course_resources"], makeCourses);
+  boot();
+  load("socials").then(paintIcons);
+  load(["courses", "course_resources"]).then(makeCourses);
 });

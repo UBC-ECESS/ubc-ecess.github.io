@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- META TAGS -->
+	<title>UBC ECESS | Courses</title>
+	<meta charset="UTF-8" />
+	<meta name="description"
+		content="Browse ECESS-curated course resources for ECE students, including lecture notes, video playlists, and course websites, organized by year level." />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<!-- FAVICONS -->
+	<link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png" />
+	<link rel="icon" type="image/png" sizes="128x128" href="../favicon/favicon-128x128.png" />
+	<link rel="icon" type="image/png" sizes="192x192" href="../favicon/android-chrome-192x192.png" />
+	<link rel="icon" type="image/png" sizes="512x512" href="../favicon/android-chrome-512x512.png" />
+	<link rel="apple-touch-icon" type="image/png" href="../favicon/apple-touch-icon.png" />
+	<link rel="icon" type="image/x-icon" href="../favicon/favicon.ico" />
+	<link rel="manifest" href="../favicon/manifest.webmanifest" />
+	<!-- STYLING -->
+	<link rel="stylesheet" href="../styles.css?version=27" />
+	<link rel="stylesheet" href="../css/courses.css?version=15" />
+	<link href="../assets/css/fontawesome.css" rel="stylesheet" />
+	<link href="../assets/css/solid.css" rel="stylesheet" />
+	<link href="../assets/css/brands.css" rel="stylesheet" />
+</head>
+
+<body id="courses-page" tabindex="0">
+	<div class="section-header">
+		<div id="refresh-mark"></div>
+		<img src="../media/headers/courses.jpg">
+		<div>
+			<h1 class="section-title">COURSES</h1>
+		</div>
+	</div>
+	<div id="content">
+		<div id="courses-layout">
+			<aside id="courses-rail">
+				<p class="courses-rail-label">Study servers</p>
+				<a class="rail-link" href="https://discord.gg/2x6Uw8ug4b" target="_blank"><i class="fa-brands fa-discord"></i>ECESS Server</a>
+				<a class="rail-link" href="https://discord.gg/6K4QSnEdkb" target="_blank"><i class="fa-brands fa-discord"></i>CPEN Gang</a>
+				<a class="rail-link" href="https://discord.gg/V9Vga7g2V5" target="_blank"><i class="fa-brands fa-discord"></i>ELEC Gang</a>
+				<ul id="course-years"></ul>
+			</aside>
+			<ul id="courses-grid"></ul>
+		</div>
+		<p class="courses-note">
+            This list is maintained by students. Review your program requirements on the official <a class="link" href="https://piazza.com/class/kbi9wbpmc9h20/post/2470" target="_blank">ECE Piazza</a>.
+            For a complete and up-to-date list of courses, refer to the official <a class="link" href="https://ece.ubc.ca/undergraduates/courses/" target="_blank">ECE department website</a>.
+        </p>
+	</div>
+	<script type="module" src="../js/courses.js?version=8"></script>
+</body>
+
+</html>

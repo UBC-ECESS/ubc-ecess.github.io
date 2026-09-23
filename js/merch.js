@@ -1,167 +1,108 @@
 import {
-  data,
-  POP_IN_VARIANCE,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  driveUrlToThumb,
-  makeSocials,
-  commonInit,
-} from "../app.js";
+  load,
+  rows,
+  field,
+  lacks,
+  photo,
+  paintIcons,
+  boot,
+} from "../app.js?version=7";
 
-// MERCH
+function stockList(row) {
+  const raw = field(row, "stock");
+  if (raw == null) return [""];
+  return String(raw).replaceAll(" ", "").split(",");
+}
 
-function makeMerchCategories() {
-  let html = "";
+function categoryIcon(categoryName) {
+  const match = rows("categories").find((row) => field(row, "name") === categoryName);
+  return match && field(match, "icon") ? field(match, "icon") : "tag";
+}
 
-  let firstCategory = true;
-  for (let i = 0; i < data.categories.length; i++) {
-    if (
-      getCell("categories", i, "name") == null ||
-      getCell("categories", i, "show") == false
-    ) {
-      continue;
-    }
+function sizeList(counts, labels) {
+  const items = labels.map((label, index) => {
+    const count = counts[index] ?? "";
+    if (count === "0" || count === "") return `<li class="out-of-stock">${label}</li>`;
+    if (Number(count) < 11) return `<li class="running-low"><div class="counter">${count}</div>${label}</li>`;
+    return `<li>${label}</li>`;
+  });
+  return `<ul class="sizes">${items.join("")}</ul>`;
+}
 
-    html += '<li><button class="button';
+function stockLine(count) {
+  if (count === "0" || count === "") return '<div class="status out-of-stock">Out of stock</div>';
+  if (Number(count) < 11) return `<div class="status running-low">Only ${count} left</div>`;
+  return '<div class="status in-stock">In stock</div>';
+}
 
-    if (firstCategory == true) {
-      firstCategory = false;
-      html += " selected";
-    }
-
-    html += `" id="${getCell("categories", i, "name")}-button">`;
-
-    if (getCell("categories", i, "icon") != null) {
-      html += `<i class="fa-solid fa-${getCell("categories", i, "icon")}"></i>`;
-    }
-
-    html += `${getCell("categories", i, "name")}</button></li>`;
-  }
-
-  document.getElementById("merch-categories").innerHTML = html;
-
-  document.querySelectorAll("#merch-categories button").forEach((el) => {
-    el.addEventListener("click", (event) => {
-      filterMerch(el.getAttribute("id").split("-")[0]);
+function paintCategories() {
+  const buttons = [];
+  let picked = false;
+  rows("categories").forEach((row) => {
+    if (field(row, "name") == null || field(row, "show") == false) return;
+    const name = field(row, "name");
+    const icon = field(row, "icon");
+    const iconMarkup = icon == null ? "" : `<i class="fa-solid fa-${icon}"></i>`;
+    const selected = picked ? "" : " selected";
+    picked = true;
+    buttons.push(`<li><button class="button${selected}" id="${name}-button">${iconMarkup}${name}</button></li>`);
+  });
+  const host = document.getElementById("merch-categories");
+  host.innerHTML = buttons.join("");
+  host.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      showCategory(button.id.slice(0, button.id.lastIndexOf("-button")));
     });
   });
 }
 
-function makeMerch() {
-  let html = "";
-
-  for (let i = 0; i < data.merch.length; i++) {
-    if (
-      anyCellNull("merch", i, ["item", "price", "category"]) == true ||
-      getCell("merch", i, "show") == false
-    ) {
-      continue;
-    } // skip blank entries
-
-    html += `<li class="merch-item ${getCell("merch", i, "category")}" style="animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;">`;
-
-    if (getCell("merch", i, "image") != null) {
-      html += `<img src="${driveUrlToThumb(getCell("merch", i, "image"))}">`;
-    } else {
-      let catIcon = "gear";
-      for (let j = 0; j < data.categories.length; j++) {
-        if (
-          getCell("categories", j, "name") == getCell("merch", i, "category")
-        ) {
-          catIcon = getCell("categories", j, "icon");
-        }
-      }
-      html += `<i class="fa-solid fa-${catIcon}"></i>`;
-    }
-
-    html += `<h2>${getCell("merch", i, "item")}</h2>`;
-    html += `<div><div class="price">$${Number(getCell("merch", i, "price")).toFixed(2)}</div>`;
-
-    let stock =
-      getCell("merch", i, "stock") == null
-        ? ""
-        : getCell("merch", i, "stock").replaceAll(" ", "").split(",");
-    if (getCell("merch", i, "sizes") != null) {
-      let sizes = getCell("merch", i, "sizes").split(", ");
-
-      html += '<ul class="sizes">';
-      for (let j = 0; j < sizes.length; j++) {
-        html += `<li${stock[j] == "0" || stock[j] == "" ? ' class="out-of-stock">' : Number(stock[j]) < 11 ? ` class="running-low"><div class="counter">${stock[j]}</div>` : ">"}${sizes[j]}</li>`;
-      }
-      html += "</ul>";
-    } else {
-      if (stock[0] == "0" || stock[0] == "") {
-        html += '<div class="status out-of-stock">Out of stock</div>';
-      } else if (Number(stock[0]) < 11) {
-        html += `<div class="status running-low">Only ${stock[0]} Left!</div>`;
-      } else {
-        html += '<div class="status in-stock">In Stock</div>';
-      }
-    }
-    html += "</div>";
-    html += "</li>";
-  }
-
-  document.getElementById("merch-grid").innerHTML = html;
+function paintMerch() {
+  const cards = rows("merch").flatMap((row) => {
+    if (lacks(row, ["item", "price", "category"]) || field(row, "show") == false) return [];
+    const category = field(row, "category");
+    const image = field(row, "image");
+    const picture = image != null
+      ? `<img src="${photo(image)}" alt="">`
+      : `<i class="fa-solid fa-${categoryIcon(category)}"></i>`;
+    const price = `$${Number(field(row, "price")).toFixed(2)}`;
+    const counts = stockList(row);
+    const sizes = field(row, "sizes");
+    const inventory = sizes != null ? sizeList(counts, sizes.split(", ")) : stockLine(counts[0]);
+    return [`<li class="merch-item ${category}">${picture}<h2>${field(row, "item")}</h2><div><div class="price">${price}</div>${inventory}</div></li>`];
+  });
+  document.getElementById("merch-grid").innerHTML = cards.join("");
 }
 
-function filterMerch(category) {
-  let merchItems = document.querySelectorAll(".merch-item");
+function firstCategory() {
+  const row = rows("categories").find((entry) => field(entry, "name") != null && field(entry, "show") != false);
+  return row ? field(row, "name") : "";
+}
 
-  let defaultCategory;
-  for (let i = 0; i < data.categories.length; i++) {
-    if (
-      getCell("categories", i, "name") == null ||
-      getCell("categories", i, "show") == false
-    ) {
-      continue;
-    }
-    defaultCategory = getCell("categories", i, "name");
-    break;
-  }
-
-  let merchGrid = document.querySelector("#merch-grid");
-  merchGrid.style = `min-height: ${merchGrid.getBoundingClientRect().height}px`;
-  setTimeout(() => {
-    merchGrid.style = "";
+function showCategory(category) {
+  const grid = document.querySelector("#merch-grid");
+  const fallback = firstCategory();
+  grid.style.minHeight = `${grid.getBoundingClientRect().height}px`;
+  window.setTimeout(() => {
+    grid.style.minHeight = "";
   }, 1);
-
-  for (let i = 0; i < merchItems.length; i++) {
-    merchItems[i].style = "";
-    merchItems[i].style.display = "none";
-
-    setTimeout(() => {
-      if (
-        category == defaultCategory ||
-        merchItems[i].classList.contains(category)
-      ) {
-        merchItems[i].style =
-          `animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;`;
-        merchItems[i].style.display = "";
-      }
+  document.querySelectorAll(".merch-item").forEach((item) => {
+    item.style.display = "none";
+    window.setTimeout(() => {
+      const keep = category === fallback || item.classList.contains(category);
+      item.style.display = keep ? "" : "none";
     }, 1);
-  }
-
-  let categoryButtons = document.querySelectorAll("#merch-categories button");
-  for (let i = 0; i < categoryButtons.length; i++) {
-    categoryButtons[i].classList.remove("selected");
-    if (categoryButtons[i].id.split("-")[0] == category) {
-      categoryButtons[i].classList.add("selected");
-    }
-  }
+  });
+  document.querySelectorAll("#merch-categories button").forEach((button) => {
+    const name = button.id.slice(0, button.id.lastIndexOf("-button"));
+    button.classList.toggle("selected", name === category);
+  });
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
-  fetchSheet("socials", makeSocials);
-  fetchSheets(["merch", "categories"], () => {
-    makeMerchCategories();
-    makeMerch();
-  });
-
-  document.querySelectorAll("#merch-categories").forEach((el) => {
-    el.addEventListener("input", filterMerch);
+  boot();
+  load("socials").then(paintIcons);
+  load(["merch", "categories"]).then(() => {
+    paintCategories();
+    paintMerch();
   });
 });

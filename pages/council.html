@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- META TAGS -->
+	<title>UBC ECESS | Council</title>
+	<meta charset="UTF-8" />
+	<meta name="description"
+		content="View past and present ECESS council members, along with their roles, responsibilities, and contact information." />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<!-- FAVICONS -->
+	<link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png" />
+	<link rel="icon" type="image/png" sizes="128x128" href="../favicon/favicon-128x128.png" />
+	<link rel="icon" type="image/png" sizes="192x192" href="../favicon/android-chrome-192x192.png" />
+	<link rel="icon" type="image/png" sizes="512x512" href="../favicon/android-chrome-512x512.png" />
+	<link rel="apple-touch-icon" type="image/png" href="../favicon/apple-touch-icon.png" />
+	<link rel="icon" type="image/x-icon" href="../favicon/favicon.ico" />
+	<link rel="manifest" href="../favicon/manifest.webmanifest" />
+	<!-- STYLING -->
+	<link rel="stylesheet" href="../styles.css?version=27" />
+	<link rel="stylesheet" href="../css/council.css?version=15" />
+	<link href="../assets/css/fontawesome.css" rel="stylesheet" />
+	<link href="../assets/css/solid.css" rel="stylesheet" />
+	<link href="../assets/css/brands.css" rel="stylesheet" />
+</head>
+
+<body id="council-page" tabindex="0">
+	<div class="section-header">
+		<div id="refresh-mark"></div>
+		<img src="../media/headers/council.jpg">
+		<div>
+			<h1 class="section-title">COUNCIL</h1>
+		</div>
+	</div>
+	<div id="content">
+		<section id="contact">
+				<div class="contact-intro">
+					<h2>Contact</h2>
+					<p>We're here to answer your questions!</p>
+				</div>
+				<form action="https://api.web3forms.com/submit" method="POST">
+					<input id="form-key" type="hidden" name="access_key">
+					<input id="form-subject" type="hidden" name="subject" value="Website Contact Message">
+					<input type="hidden" name="from_name">
+					<input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+					<div class="form-container">
+						<div>
+							<label for="name"><h3>Name</h3></label>
+							<input id="name" type="text" name="name" required>
+						</div>
+						<div>
+							<label for="email"><h3>Email</h3></label>
+							<input id="email" type="email" name="email" required>
+						</div>
+						<div class="form-wide">
+							<label for="form-type"><h3>Topic</h3></label>
+							<select id="form-type" name="topic" required></select>
+						</div>
+						<div class="form-wide">
+							<label for="message"><h3>Message</h3></label>
+							<textarea id="message" name="message" rows="3" required></textarea>
+						</div>
+						<div class="form-wide">
+							<button id="send" type="submit" class="button important" disabled><i class="fa-solid fa-paper-plane"></i><span>Send</span></button>
+						</div>
+					</div>
+				</form>
+		</section>
+		<section id="hiring">
+			<h2>Hiring</h2>
+			<div>
+				<ul id="role-exec" class="roles"></ul>
+				<ul id="role-other" class="roles"></ul>
+			</div>
+		</section>
+		<ul id="people"></ul>
+	</div>
+	<script type="module" src="../js/council.js?version=13"></script>
+</body>
+
+</html>
