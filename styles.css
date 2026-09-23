@@ -17,19 +17,17 @@
 	--icon-gap: 0.5em;
 	--radius: 3px;
 	--gap: 10px;
-	--board-gap: min(5vw, 100px);
-	--board-row: min(20vw, 100px);
-	--board-top: clamp(60px, 10vw, 100px);
+	--frame-gap: min(5vw, 100px);
+	--frame-row: min(20vw, 100px);
+	--frame-top: clamp(60px, 10vw, 100px);
 	--name-gap: calc(var(--leading) * 1rem - 1rem) 0 0 0;
 
 	--menu-time: 0.2s;
 
-	/* section headers */
 	--hero-shadow: 0 0 0.3em hsl(0, 0%, 0%, 50%);
 	--hero-filter: brightness(0.9) blur(calc(var(--hero-height) / 55));
 
 	/* padding */
-	/* split up because sometimes maths need to be done */
 	--pad-sm-v: 0.3em;
 	--pad-sm-h: 1em;
 	--pad-v: 0.4em;
@@ -42,14 +40,12 @@
 	--icon-pad-h: 0.15em;
 	--tip-pad-v: 0.5rem;
 	--tip-pad-h: 0.8rem;
-	/* bundled for easy use with elements */
 	--pad-sm: var(--pad-sm-v) var(--pad-sm-h);
 	--pad: var(--pad-v) var(--pad-h);
 	--pad-lg: var(--pad-lg-v) var(--pad-lg-h);
 	--pad-xl: var(--pad-xl-v) var(--pad-xl-h);
 	--icon-pad: var(--icon-pad-v) var(--icon-pad-h);
 	--tip-pad: var(--tip-pad-v) var(--tip-pad-h);
-	/* single-line heights for quick use */
 	--line-sm: calc(1em * var(--leading) + 2 * var(--pad-sm-v));
 	--line: calc(1em * var(--leading) + 2 * var(--pad-v));
 	--line-lg: calc(1em * var(--leading) + 2 * var(--pad-lg-v));
@@ -59,23 +55,17 @@
 	--bar-height: 68px;
 	--hero-height: 220px;
 	--measure: clamp(30vw, 1500px, 85vw);
-	--board: clamp(60vw, 1700px, 85vw);
+	--frame: clamp(60vw, 1700px, 85vw);
 	--film: clamp(60vw, 1700px, 85vw);
-	--board-cols: 3;
+	--frame-cols: 3;
 
-	--tier-a-logo: calc(6rem * var(--scale));
-	--tier-b-logo: calc(5rem * var(--scale));
-	--tier-c-logo: calc(4rem * var(--scale));
-	--tier-d-logo: calc(3rem * var(--scale));
-
-	--board-col: calc(calc(var(--board) - var(--board-gap) * (var(--board-cols) - 1)) / var(--board-cols));
+	--frame-col: calc(calc(var(--frame) - var(--frame-gap) * (var(--frame-cols) - 1)) / var(--frame-cols));
 
 	/* colours */
 	--paper: hsl(0, 0%, 98%);
 	--ink: hsl(0, 0%, 2%);
 }
 
-/* @media (prefers-color-scheme: light) { */
 :root {
 	--canvas: hsl(0, 0%, 98%);
 	--ink: hsl(0, 0%, 2%);
@@ -105,33 +95,20 @@
 	--ece-95: hsl(202, 45%, 96%);
 
 	--wash: hsl(0, 0%, 92%);
-	/* chips, cards */
 
 	--shadow: hsl(0, 0%, 0%, 10%);
 	--tip-line: hsl(0, 0%, 70%);
 
-	/* sponsors colours */
-	--tier-a-ink: hsl(0, 50%, 20%);
-	--tier-a-wash: hsl(0, 50%, 90%);
-	--tier-b-ink: hsl(202, 47%, 28%);
-	--tier-b-wash: hsl(202, 40%, 90%);
-	--tier-c-ink: hsl(35, 80%, 20%);
-	--tier-c-wash: hsl(35, 80%, 90%);
-	--tier-d-ink: hsl(0, 0%, 15%);
-	--tier-d-wash: hsl(0, 0%, 90%);
+	--red: hsl(2, 68%, 52%);
+	--green: hsl(152, 42%, 34%);
+	--yellow: hsl(38, 72%, 46%);
 
-	/* merch (+leaderboard) colours */
-	--red: hsl(0, 70%, 55%);
-	--green: hsl(120, 55%, 38%);
-	--yellow: hsl(35, 70%, 50%);
-
-	/* leaderboard colours */
-	--first: hsl(40, 90%, 60%);
-	--first-glow: hsl(40, 90%, calc(50% + 60% / 2), 100%);
-	--second: hsl(200, 70%, 62%);
-	--second-glow: hsl(200, 75%, calc(50% + 62% / 2), 100%);
-	--third: hsl(40, 60%, 43%);
-	--third-glow: hsl(40, 60%, calc(50% + 43% / 2), 100%);
+	--first: hsl(42, 86%, 56%);
+	--first-glow: hsl(42, 70%, 80%);
+	--second: hsl(198, 62%, 58%);
+	--second-glow: hsl(198, 48%, 80%);
+	--third: hsl(28, 48%, 42%);
+	--third-glow: hsl(28, 36%, 74%);
 
 	/* course year colours */
 	--course-200-h: hsl(170, 55%, 22%);
@@ -146,9 +123,9 @@
 
 @media (max-width: 1500px) {
 	:root {
-		--board: min(90vw, 1000px);
+		--frame: min(90vw, 1000px);
 		--film: min(90vw, 1200px);
-		--board-cols: 2;
+		--frame-cols: 2;
 	}
 }
 
@@ -157,9 +134,9 @@
 		--scale: 1.25;
 		--display: calc(pow(var(--scale), 6) * var(--text-size));
 		--hero-height: 200px;
-		--board: min(90vw, 500px);
+		--frame: min(90vw, 500px);
 		--film: min(90vw, 600px);
-		--board-cols: 1;
+		--frame-cols: 1;
 	}
 }
 
@@ -239,7 +216,6 @@ p {
 	margin: 1rem 0 1rem 0;
 }
 
-/* ANIMATIONS */
 
 @keyframes icon-click {
 	20% {
@@ -255,7 +231,6 @@ p {
 	}
 }
 
-/* GENERAL */
 
 #content {
 	margin-top: 0;
@@ -381,7 +356,7 @@ header nav {
 a.link:not(.button) {
 	text-decoration: none;
 	color: var(--ece-55);
-	transition-property: color, text-decoration;
+	transition-property: color, background-color, text-decoration;
 	transition-duration: 0.1s;
 	transition-timing-function: ease-in-out;
 }
@@ -565,10 +540,10 @@ header nav .button.nav.current::after {
 }
 
 .button.animating i::before {
-	animation: icon-click 0.5s ease-in-out 0s 1 forwards;
+	animation: icon-click 0.45s ease-out forwards;
 }
 
-.button:not(.selected):not(.animating):not(.mouseover):hover i::before {
+.button:hover:not(.selected):not(.animating):not(.mouseover) i::before {
 	transform: scale(1.12);
 }
 
@@ -601,7 +576,7 @@ header nav .button.nav.current::after {
 		display: none;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
+	@media screen and (prefers-reduced-motion: reduce) {
 		header nav.hidden .button.nav {
 			opacity: 0;
 		}
@@ -641,7 +616,7 @@ header nav .button.nav.current::after {
 	background: transparent;
 }
 
-.section-header>div:not(#reload-indicator) {
+.section-header>div:not(#refresh-mark) {
 	width: 100%;
 	position: relative;
 	top: auto;
@@ -665,7 +640,7 @@ header nav .button.nav.current::after {
 	object-position: center 40%;
 }
 
-#reload-indicator {
+#refresh-mark {
 	z-index: 1;
 	content: '';
 	font-size: var(--heading);
@@ -844,7 +819,7 @@ header nav .button.nav.current::after {
 	line-height: var(--leading);
 	padding: var(--tip-pad);
 	opacity: 0;
-	transform: translateY(calc(-100% - 2rem + 5px));
+	transform: translateY(-2.4rem);
 	transition-property: opacity, transform;
 	transition-duration: 0.3s;
 	transition-timing-function: ease-in-out;
@@ -881,12 +856,11 @@ header nav .button.nav.current::after {
 }
 
 :has(>.tooltip):hover>.tooltip {
-	transform: translateY(calc(-100% - 2rem));
+	transform: translateY(calc(-100% - 1.6rem));
 	opacity: 1;
 	transition-delay: 0.3s;
 }
 
-/* CONTACT */
 
 #council-page .contact-split {
 	display: grid;

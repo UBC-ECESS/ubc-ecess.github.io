@@ -23,11 +23,11 @@
 
 #courses-grid {
 	display: grid;
-	width: var(--board);
-	grid-template-columns: repeat(var(--board-cols), 1fr);
+	width: var(--frame);
+	grid-template-columns: repeat(var(--frame-cols), 1fr);
 	grid-template-rows: auto;
-	column-gap: var(--board-gap);
-	row-gap: var(--board-row);
+	column-gap: var(--frame-gap);
+	row-gap: var(--frame-row);
 	margin-top: 1.25rem;
 	padding: 0;
 	list-style: none;

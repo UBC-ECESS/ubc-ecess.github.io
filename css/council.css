@@ -1,83 +1,3 @@
-#council-grid {
-	display: grid;
-	width: var(--board);
-	grid-template-columns: repeat(var(--board-cols), minmax(0, 1fr));
-	grid-template-rows: auto;
-	column-gap: var(--board-gap);
-	row-gap: var(--board-row);
-	margin-top: 1.75rem;
-	padding: 0;
-	list-style: none;
-}
-
-.council-member {
-	text-align: left;
-}
-
-.council-member img {
-	border-radius: var(--radius);
-	object-fit: cover;
-	width: 100%;
-	aspect-ratio: 1 / 1;
-}
-
-.council-member>i {
-	background-color: var(--wash);
-	color: var(--canvas);
-	font-size: calc(var(--board-col) * 0.6);
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	border-radius: var(--radius);
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.council-member h2 {
-	/* name */
-	font-size: var(--subhead);
-	margin: var(--name-gap);
-}
-
-.council-member h3 {
-	/* position */
-	font-size: var(--kicker);
-	font-weight: 400;
-	margin: 0;
-}
-
-.council-member h3>span {
-	white-space: nowrap;
-}
-
-.council-member h3 i {
-	margin-left: var(--icon-gap);
-	font-size: var(--text-size);
-	color: var(--ece-20);
-}
-
-.council-member ul {
-	margin: 1rem 0 0 0;
-	padding: 0;
-	list-style-type: none;
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	gap: var(--gap);
-	flex-wrap: wrap;
-}
-
-.council-member li:has(> a) {
-	background: none;
-	padding: 0;
-	display: flex;
-}
-
-.council-member .button.link {
-	padding: var(--pad-sm);
-}
-
 #council-page #content {
 	align-items: stretch;
 }
@@ -128,7 +48,7 @@
 	gap: 0.35rem 1.25rem;
 }
 
-.openings {
+.roles {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
@@ -138,11 +58,11 @@
 	list-style: none;
 }
 
-.openings:not(:has(:first-child)) {
+.roles:not(:has(:first-child)) {
 	display: none;
 }
 
-.openings li:not(:has(.no-entries)) {
+.roles li:not(:has(.empty-note)) {
 	display: flex;
 	align-items: center;
 	border-left: 3px solid var(--ece-20);
@@ -151,22 +71,46 @@
 	font-size: 0.92rem;
 }
 
-.openings li > i {
+.roles li > i {
 	color: var(--ece-20);
 	margin-left: 0.45rem;
 }
 
-.no-entries {
+.empty-note {
 	padding: 0.6rem 0;
 }
 
-#council-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+#people {
 	width: min(100% - 2rem, var(--measure));
-	margin: 1.5rem auto 2.5rem;
-	gap: 1.75rem 1.25rem;
+	margin: 1.75rem auto 2.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2.75rem;
 	align-self: stretch;
+}
+
+.council-year > h2 {
+	margin: 0 0 1rem;
+	font-size: var(--subhead);
+	text-align: left;
+}
+
+.council-year > h2::after {
+	content: "";
+	display: block;
+	width: 2.25rem;
+	height: 2px;
+	margin-top: 0.45rem;
+	background: var(--ece-20);
+}
+
+.council-year > ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	gap: 1.75rem 1.25rem;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
 .council-member {
@@ -192,6 +136,31 @@
 .council-member h2,
 .council-member h3 {
 	margin: 0;
+	width: 100%;
+}
+
+.council-member h3 {
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.council-member .role {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 0.35rem;
+	width: 100%;
+}
+
+.council-member .role-name {
+	min-width: 0;
+	white-space: nowrap;
+}
+
+.council-member .role i {
+	flex: none;
+	line-height: 1;
 }
 
 .council-member h2 {
@@ -199,6 +168,8 @@
 }
 
 .council-member ul {
+	list-style: none;
+	padding: 0;
 	margin: 0.1rem 0 0;
 }
 

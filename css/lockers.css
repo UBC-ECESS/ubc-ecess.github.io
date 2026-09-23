@@ -134,7 +134,7 @@
 }
 
 #locker-detail {
-	width: min(var(--board), 100%);
+	width: min(var(--frame), 100%);
 	max-width: 100%;
 	box-sizing: border-box;
 	margin: 1.25rem auto 1rem auto;

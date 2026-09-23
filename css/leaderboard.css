@@ -1,4 +1,3 @@
-/* LEADERBOARD */
 
 #leaderboard-page nav {
 	position: absolute;
@@ -182,7 +181,7 @@
 	}
 }
 
-#leaderboard-page #reload-indicator {
+#leaderboard-page #refresh-mark {
 	color: var(--ink);
 	text-shadow: none;
 }

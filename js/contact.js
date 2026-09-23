@@ -19,7 +19,7 @@ import {
   CONFIG,
 } from "../app.js?version=7";
 
-function makeContactOptions() {
+function fillTopics() {
   let html = `<option value="" selected disabled>Select Topic</option>`;
   for (let i = 0; i < rows("contacts").length; i++) {
     if (
@@ -27,7 +27,7 @@ function makeContactOptions() {
       field(rows("contacts")[i], "show") == false
     ) {
       continue;
-    } // skip blank entries
+}
     html += `<option value="${field(rows("contacts")[i], "option")}">${field(rows("contacts")[i], "option")}</option>`;
   }
 
@@ -36,7 +36,8 @@ function makeContactOptions() {
     .getElementById("form-subject")
     .setAttribute("value", "Website Contact Message");
 
-  document.getElementById("form-type").innerHTML = html;
+  const topicMenu = document.getElementById("form-type");
+  topicMenu.innerHTML = html;
   setSendEnabled(false);
 }
 
@@ -44,9 +45,9 @@ function setSendEnabled(enabled) {
   document.getElementById("send").disabled = !enabled;
 }
 
-function updateContactForm() {
-  let selectObj = document.getElementById("form-type");
-  let type = selectObj.options[selectObj.selectedIndex].value;
+function applyTopic() {
+  const topicMenu = document.getElementById("form-type");
+  const type = topicMenu.value;
   if (type == "") {
     document.getElementById("form-key").setAttribute("value", "");
     document.getElementById("form-subject").setAttribute("value", "Website Contact Message");
@@ -61,7 +62,7 @@ function updateContactForm() {
       field(rows("contacts")[i], "show") == false
     ) {
       continue;
-    } // skip blank entries
+}
     if (field(rows("contacts")[i], "option") == type) {
       let searchEmail =
         field(rows("contacts")[i], "override") != null
@@ -77,22 +78,20 @@ function updateContactForm() {
           key =
             field(rows("positions")[j], "key") != null
               ? field(rows("positions")[j], "key")
-              : field(rows("positions")[0], "key"); // lowermost default to president
+              : field(rows("positions")[0], "key");
           break;
         }
       }
     }
   }
-  let subject = `Website Contact Message (${type})`;
+  const subject = `Website Contact Message (${type})`;
 
   document.getElementById("form-key").setAttribute("value", key?.trim() ?? "");
-  document.getElementById("form-subject").setAttribute("value", subject);
+  document.getElementById("form-subject").value = subject;
   setSendEnabled(true);
 }
 
 export function startContactForm() {
-  load(["contacts", "positions"]).then(makeContactOptions);
-  document.querySelectorAll("#form-type").forEach((el) => {
-    el.addEventListener("input", updateContactForm);
-  });
+  load(["contacts", "positions"]).then(fillTopics);
+  document.getElementById("form-type").addEventListener("input", applyTopic);
 }

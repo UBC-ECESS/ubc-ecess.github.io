@@ -51,7 +51,7 @@ const LOCKER_CELL_MAX = 100;
 function renderLockers() {
   if (!lockersReady || !rows("sets") || rows("sets").length == 0) return;
 
-  makeLockers();
+  renderLockerRows();
   if (document.getElementById("locker-detail").style.display != "none") {
     renderFloorLayout();
   }
@@ -215,7 +215,7 @@ function makeSectionGrid(setName, start, end, floorUnavailable) {
 /*
  * Renders Floor Overview Cards from the Sets Sheet.
  */
-function makeLockers() {
+function renderLockerRows() {
   visibleFloors = [];
   let html = "";
 
@@ -246,7 +246,8 @@ function makeLockers() {
     html += `</li>`;
   }
 
-  document.getElementById("lockers").innerHTML = html;
+  const lockerList = document.getElementById("lockers");
+  lockerList.innerHTML = html;
   bindLockerCards();
 }
 

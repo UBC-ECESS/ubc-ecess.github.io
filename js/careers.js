@@ -145,7 +145,7 @@ function makePostIts() {
   if (!list) return;
 
   const today = Date.now() - 1000 * 60 * 60 * 24;
-  const rows = [];
+  const notes = [];
   for (let i = 0; i < rows("external").length; i++) {
     if (
       field(rows("external")[i], "show") == false ||
@@ -157,24 +157,24 @@ function makePostIts() {
     if (expiryUtc != null && expiryUtc < today) {
       continue;
     }
-    rows.push(i);
+    notes.push(i);
   }
 
-  rows.sort((a, b) => {
+  notes.sort((a, b) => {
     const da = sheetDateUTC(field(rows("external")[a], "date")) || 0;
     const db = sheetDateUTC(field(rows("external")[b], "date")) || 0;
     return db - da;
   });
 
-  if (rows.length == 0) {
+  if (notes.length == 0) {
     list.innerHTML =
-      '<li><div class="no-entries">No postings right now. Check back later!</div></li>';
+      '<li><div class="empty-note">No postings right now. Check back later!</div></li>';
     return;
   }
 
   let html = "";
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+  for (let i = 0; i < notes.length; i++) {
+    const row = notes[i];
     const name = field(rows("external")[row], "name");
     const description = field(rows("external")[row], "description");
     const location = field(rows("external")[row], "location");

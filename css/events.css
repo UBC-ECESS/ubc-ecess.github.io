@@ -1,151 +1,3 @@
-#events {
-	width: var(--board);
-	display: grid;
-	grid-template-columns: repeat(var(--board-cols), minmax(0, 1fr));
-	column-gap: var(--board-gap);
-	row-gap: var(--board-row);
-	padding: 0;
-	margin-top: 1.75rem;
-	margin-bottom: 1rem;
-	list-style: none;
-}
-
-#events:has(> li > .no-entries) {
-	grid-template-columns: 1fr;
-}
-
-.event {
-	flex: 1 0 0;
-	text-align: left;
-}
-
-.event>div {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	align-items: center;
-	position: relative;
-	aspect-ratio: 4 / 5;
-}
-
-.event>div img {
-	object-fit: cover;
-	width: 100%;
-	transform: scale(1);
-	border-radius: var(--radius);
-	transition-property: filter, transform;
-	transition-duration: 0.2s;
-	transition-timing-function: ease-in-out;
-	transition-delay: 0.1s;
-}
-
-.event>div>i {
-	background-color: var(--wash);
-	color: var(--canvas);
-	width: 100%;
-	aspect-ratio: 4 / 5;
-	box-sizing: border-box;
-	border-radius: var(--radius);
-	font-size: calc(var(--board-col) * 0.6);
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
-.event-hover-links {
-	position: absolute;
-	left: var(--gap);
-	bottom: var(--gap);
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: calc(var(--gap) * 0.8);
-	z-index: 2;
-}
-
-.event-hover-links a {
-	position: relative;
-	left: 0;
-	bottom: 0;
-	font-size: var(--text-size);
-	aspect-ratio: 1;
-	box-sizing: border-box;
-	opacity: 0;
-	padding: 0 0.4em;
-	pointer-events: none;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	transform: scale(0.97);
-	transition-property: opacity, transform, box-shadow;
-	transition-duration: 0.2s;
-	transition-timing-function: ease-in-out;
-}
-
-/* .event > div:has(a):hover img {
-  filter: brightness(0.7) blur(2px);
-  transform: scale(0.99);
-  transition-delay: 0s;
-} */
-
-.event>div:has(.event-hover-links):hover .event-hover-links a {
-	pointer-events: auto;
-	opacity: 1;
-	transform: scale(1);
-}
-
-.event h2 {
-	/* name */
-	margin: var(--name-gap);
-	font-size: var(--subhead);
-}
-
-.event ul {
-	display: flex;
-	flex-direction: row;
-	justify-content: stretch;
-	align-items: stretch;
-	flex-wrap: wrap;
-	padding: 0;
-	gap: var(--gap);
-	margin: calc(1.5 * var(--gap)) 0 0 0;
-}
-
-.event li {
-	list-style-type: none;
-	flex-grow: 1;
-}
-
-.event li:not(:has(a)) {
-	color: var(--ink);
-	background: none;
-	padding: 0.15rem 0.55rem;
-	border: none;
-	border-left: 3px solid var(--ece-20);
-	border-radius: 0;
-	text-align: left;
-	font-family: 'IBM Plex Mono', ui-monospace, monospace;
-	font-size: 0.85rem;
-}
-
-.event li:has(a) {
-	display: flex;
-	flex-direction: row;
-	justify-content: stretch;
-	align-items: stretch;
-}
-
-.event li a {
-	flex-grow: 1;
-}
-
-.event li:not(:has(a)) i {
-	color: var(--ink);
-	margin-right: var(--icon-gap);
-}
-
 #home-page #events {
 	display: flex;
 	flex-direction: column;
@@ -172,7 +24,7 @@
 	display: none;
 }
 
-#home-page .event .event-dtl {
+#home-page .event .event-when {
 	display: contents;
 }
 
@@ -208,7 +60,7 @@
 	letter-spacing: 0;
 }
 
-#home-page .event .event-links {
+#home-page .event .event-actions {
 	grid-column: 4;
 	grid-row: 1;
 	justify-self: end;
@@ -221,13 +73,13 @@
 	min-width: max-content;
 }
 
-#home-page .event .event-links li,
-#home-page .event .event-links li a {
+#home-page .event .event-actions li,
+#home-page .event .event-actions li a {
 	flex-grow: 0;
 	width: auto;
 }
 
-#home-page .event .event-links a {
+#home-page .event .event-actions a {
 	white-space: nowrap;
 }
 
@@ -239,7 +91,7 @@
 		align-items: stretch;
 	}
 
-	#home-page .section-header>div:not(#reload-indicator) {
+	#home-page .section-header>div:not(#refresh-mark) {
 		flex-direction: column;
 		align-items: flex-start;
 	}
@@ -281,14 +133,14 @@
 		overflow-wrap: anywhere;
 	}
 
-	#home-page .event .event-links {
+	#home-page .event .event-actions {
 		grid-area: links;
 		grid-row: auto;
 		align-self: center;
 		min-width: max-content;
 	}
 
-	#home-page .event .event-links a {
+	#home-page .event .event-actions a {
 		padding: 0.35rem 0.5rem;
 		font-size: 0.78rem;
 	}

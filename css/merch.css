@@ -24,12 +24,12 @@
 
 #merch-grid {
 	display: grid;
-	width: var(--board);
-	grid-template-columns: repeat(var(--board-cols), 1fr);
+	width: var(--frame);
+	grid-template-columns: repeat(var(--frame-cols), 1fr);
 	grid-template-rows: auto;
-	column-gap: var(--board-gap);
-	row-gap: var(--board-row);
-	margin-top: calc(var(--board-top) / 2);
+	column-gap: var(--frame-gap);
+	row-gap: var(--frame-row);
+	margin-top: calc(var(--frame-top) / 2);
 	padding: 0;
 	list-style: none;
 }
@@ -52,7 +52,7 @@
 	width: 100%;
 	aspect-ratio: 1 / 1;
 	border-radius: var(--radius);
-	font-size: calc(var(--board-col) * 0.6);
+	font-size: calc(var(--frame-col) * 0.6);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -60,7 +60,6 @@
 }
 
 .merch-item h2 {
-	/* name */
 	text-align: left;
 	font-size: var(--subhead);
 	margin: var(--name-gap);

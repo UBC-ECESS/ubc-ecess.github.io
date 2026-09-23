@@ -19,16 +19,17 @@ import {
   CONFIG,
 } from "../app.js?version=7";
 
-export function makeEvents(num) {
+export function listUpcoming(num) {
   let upcoming = new Map();
-  let today = Date.now() - 1000 * 60 * 60 * 24;
+  const dayMs = 24 * 60 * 60 * 1000;
+  let today = Date.now() - dayMs;
   for (let i = 0; i < rows("events").length; i++) {
     if (
       field(rows("events")[i], "show") == false ||
       lacks(rows("events")[i], ["date", "name"]) == true
     ) {
       continue;
-    } // skip blank entries
+}
     let utc = sheetUtc(field(rows("events")[i], "date"));
     if (utc < today) {
       continue;
@@ -37,26 +38,26 @@ export function makeEvents(num) {
   }
 
   if (upcoming.size == 0) {
-    let html = `<li><div class="no-entries">No upcoming events. See you next term!</div></li>`;
-    document.getElementById("events").innerHTML = html;
+    const empty = document.getElementById("events");
+    empty.innerHTML = `<li><div class="empty-note">Nothing coming up. See you next term.</div></li>`;
     wireIcons();
     return;
   }
 
   let sorted = Array.from(upcoming)
     .sort((a, b) => a[1] - b[1])
-    .slice(0, Math.min(num, Array.from(upcoming).length));
+    .slice(0, num);
 
   let html = "";
-  for (let i = 0; i < sorted.length; i++) {
-    let currEvent = sorted[i][0];
+  for (const pair of sorted) {
+    let currEvent = pair[0];
     html += `<li class="event">`;
 
     html += "<div>";
     if (field(rows("events")[currEvent], "image") != null) {
       html += `<img src="${photo(field(rows("events")[currEvent], "image"))}" alt="${field(rows("events")[currEvent], "name")}">`;
     } else {
-      html += '<i class="fa-solid fa-gear"></i>';
+      html += '<i class="fa-solid fa-calendar-day"></i>';
     }
 
     const hoverRsvpLabel = field(rows("events")[currEvent], "rsvp_label");
@@ -65,7 +66,7 @@ export function makeEvents(num) {
     const hoverInstagramLink = field(rows("events")[currEvent], "instagram");
     const validHoverInstagramLink = getValidEventUrl(hoverInstagramLink);
     if (validHoverRsvpLink || validHoverInstagramLink) {
-      html += '<div class="event-hover-links">';
+      html += '<div class="event-quick">';
 
       if (validHoverRsvpLink) {
         html += `<a class="button link icon" href="${validHoverRsvpLink}" target="_blank"><i class="fa-solid ${getRsvpIconClass(hoverRsvpLabel, validHoverRsvpLink)}"></i></a>`;
@@ -80,7 +81,7 @@ export function makeEvents(num) {
     html += "</div>";
 
     html += `<h2>${field(rows("events")[currEvent], "name")}</h2>`;
-    html += '<ul class="event-dtl">';
+    html += '<ul class="event-when">';
     html += `<li class="event-date">${writtenDate(field(rows("events")[currEvent], "date"))}</li>`;
     let eventTime =
       field(rows("events")[currEvent], "start", true) == null
@@ -96,7 +97,7 @@ export function makeEvents(num) {
     html += `<li class="event-meta">${eventTime} · ${eventPlace}</li>`;
     html += "</ul>";
     if (present(rows("events")[currEvent], ["contacts", "rsvp", "calendar"])) {
-      html += '<ul class="event-links">';
+      html += '<ul class="event-actions">';
 
       const rsvpLink = field(rows("events")[currEvent], "rsvp");
       const validRsvpLink = getValidEventUrl(rsvpLink);
@@ -114,31 +115,22 @@ export function makeEvents(num) {
           : "";
 
       if (field(rows("events")[currEvent], "contacts") != null) {
-        let eventContacts = field(rows("events")[currEvent], "contacts").split(
-          ", ",
-        );
-
-        let href = "mailto:";
-        for (let i = 0; i < eventContacts.length; i++) {
-          if (i > 0) {
-            href += ",";
-          }
-          for (let j = 0; j < rows("positions").length; j++) {
-            if (eventContacts[i] == field(rows("positions")[j], "position")) {
-              href += field(rows("positions")[j], "email");
-            }
-          }
-        }
-        href += `?subject=${CONFIG.siteNameFull} ${field(rows("events")[currEvent], "name")}`;
-
-        html += `<li><a class="button link" href="${href}" target="_blank"><i class="fa-solid fa-envelope"></i>Contact Organizers</a></li>`;
+        const titles = field(rows("events")[currEvent], "contacts").split(", ");
+        const emails = titles.flatMap((title) => {
+          const role = rows("positions").find((row) => field(row, "position") === title);
+          return role && field(role, "email") ? [field(role, "email")] : [];
+        });
+        const subject = encodeURIComponent(`${CONFIG.siteNameFull} ${field(rows("events")[currEvent], "name")}`);
+        const href = `mailto:${emails.join(",")}?subject=${subject}`;
+        html += `<li><a class="button link" href="${href}" target="_blank"><i class="fa-solid fa-envelope"></i>Email organizers</a></li>`;
       }
 
       html += "</ul>";
     }
     html += "</li>";
   }
-  document.getElementById("events").innerHTML = html;
+  document.getElementById("events").replaceChildren();
+  document.getElementById("events").insertAdjacentHTML("beforeend", html);
   wireIcons();
 }
 

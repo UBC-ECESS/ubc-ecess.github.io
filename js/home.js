@@ -16,8 +16,8 @@ import {
   boot,
   CONFIG,
 } from "../app.js?version=7";
-import { makeEvents } from "./events.js?version=8";
-function makeLinks() {
+import { listUpcoming } from "./events.js?version=10";
+function buildShortcuts() {
   let html = "";
   let linkIdx = 0;
   for (let i = 0; i < rows("links").length; i++) {
@@ -26,7 +26,7 @@ function makeLinks() {
       field(rows("links")[i], "show") == false
     ) {
       continue;
-    } // skip blank entries
+}
     let icon =
       lacks(rows("links")[i], ["icon_pack", "icon"]) == false
         ? `<i class="fa-${field(rows("links")[i], "icon_pack")} fa-${field(rows("links")[i], "icon")}"></i>`
@@ -34,14 +34,14 @@ function makeLinks() {
     html += `<li><a class="button link" href="${field(rows("links")[i], "link")}" target="_blank">${icon + field(rows("links")[i], "name")}</a></li>`;
     linkIdx++;
   }
-  document.getElementById("links").innerHTML = html;
+  const linkList = document.getElementById("links");
+  linkList.innerHTML = html;
   wireIcons();
 }
 
-function makeGallery() {
+function buildGallery() {
   let yearsSet = new Set();
   for (let i = 0; i < rows("collections").length; i++) {
-    // loops through collections entries and gets the most recent year
     if (
       field(rows("collections")[i], "name") == null ||
       field(rows("collections")[i], "show") == false
@@ -59,12 +59,13 @@ function makeGallery() {
     galleryYears.push(el);
   }
 
-  galleryYears = galleryYears.sort().reverse();
+  galleryYears.sort((a, b) => b - a);
 
   let html = "";
 
-  for (let i = 0; i < galleryYears.length; i++) {
-    html += `<h3>${galleryYears[i]}–${galleryYears[i] + 1}</h3>`;
+  for (const year of galleryYears) {
+    const yearLabel = `${year}–${year + 1}`;
+    html += `<h3>${yearLabel}</h3>`;
     for (let j = rows("collections").length - 1; j >= 0; j--) {
       if (
         field(rows("collections")[j], "name") == null ||
@@ -75,11 +76,12 @@ function makeGallery() {
       let currYear = Number(
         field(rows("collections")[j], "name").split(" ")[0].split("/")[0],
       );
-      if (galleryYears[i] != currYear) {
+      if (year != currYear) {
         continue;
       }
       let collectionName = field(rows("collections")[j], "name");
-      html += `<h4>${collectionName.substring(collectionName.indexOf(" ") + 1)}</h4>`;
+      const title = collectionName.slice(collectionName.indexOf(" ") + 1);
+      html += `<h4>${title}</h4>`;
       html += '<ul class="collection">';
 
       for (let k = 0; k < rows("gallery").length; k++) {
@@ -106,7 +108,8 @@ function makeGallery() {
     }
   }
 
-  document.getElementById("gallery").innerHTML = html;
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = html;
   startGallerySlideshows();
 }
 
@@ -182,7 +185,7 @@ function startGallerySlideshows() {
 window.addEventListener("DOMContentLoaded", () => {
   boot();
   load("socials").then(paintIcons);
-  load("links").then(makeLinks);
-  load(["events", "positions"]).then(() => makeEvents(Number.POSITIVE_INFINITY));
-  load(["collections", "gallery"]).then(makeGallery);
+  load("links").then(buildShortcuts);
+  load(["events", "positions"]).then(() => listUpcoming(Number.POSITIVE_INFINITY));
+  load(["collections", "gallery"]).then(buildGallery);
 });

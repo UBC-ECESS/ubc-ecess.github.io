@@ -122,7 +122,7 @@ function makeCourses() {
   }
 
   if (idx === 0) {
-    html = `<li><div class="no-entries">No Courses Listed Yet...Check Back Soon!</div></li>`;
+    html = `<li><div class="empty-note">No Courses Listed Yet...Check Back Soon!</div></li>`;
   }
 
   document.getElementById("courses-grid").innerHTML = html;

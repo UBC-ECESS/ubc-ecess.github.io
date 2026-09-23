@@ -18,92 +18,75 @@ import {
   boot,
   CONFIG,
 } from "../app.js?version=7";
-import { startContactForm } from "./contact.js?version=10";
+import { startContactForm } from "./contact.js?version=12";
 
-function latestCouncilYear() {
-  let latest = null;
+function councilYears() {
+  const years = [];
   for (let i = 0; i < rows("council").length; i++) {
     if (field(rows("council")[i], "year") == null) break;
     const currYear = Number(field(rows("council")[i], "year").split("/")[0]);
-    if (Number.isNaN(currYear)) continue;
-    if (latest == null || currYear > latest) latest = currYear;
+    if (Number.isNaN(currYear) || years.includes(currYear)) continue;
+    years.push(currYear);
   }
-  return latest;
+  years.sort((a, b) => b - a);
+  return years;
 }
 
-function makeCouncilGrid() {
-  const selectedYear = latestCouncilYear();
-
-  let html = "";
-  for (let p = 0; p < rows("positions").length; p++) {
-    // looping through the positions sheet allows for heirarchical ordering even if the 'Council' sheet entries are out of order
-    for (let i = 0; i < rows("council").length; i++) {
-      if (field(rows("council")[i], "year") == null) {
-        break;
-      } // skip blank entries
-      let currYear = Number(field(rows("council")[i], "year").split("/")[0]); // current year
-      if (isNaN(currYear) == true) {
-        continue;
-      }
-      let currPositions = field(rows("council")[i], "position").split(", "); // creates an array of positions held by the member
-      if (
-        currYear == selectedYear &&
-        currPositions[0] == field(rows("positions")[p], "position")
-      ) {
-        // heirarchical ordering done by *first* position in list
-        html += `<li class="council-member visible">`;
-
-        if (field(rows("council")[i], "photo") != null) {
-          html += `<img src="${photo(field(rows("council")[i], "photo"))}" alt="${field(rows("council")[i], "name")}">`; // photo
-        } else {
-          html += '<i class="fa-solid fa-user"></i>';
-        }
-
-        html += `<h2>${ordinal(field(rows("council")[i], "name"))}</h2>`;
-        html += "<h3>";
-        for (let j = 0; j < currPositions.length; j++) {
-          for (let k = 0; k < rows("positions").length; k++) {
-            if (currPositions[j] == field(rows("positions")[k], "position")) {
-              html += `<span>${ordinal(currPositions[j])}<i class="fa-solid fa-circle-info"><div class="tooltip">${ordinal(field(rows("positions")[k], "responsibilities"))}</div></i></span>`;
-              break;
-            }
-          }
-          if (j + 1 < currPositions.length) {
-            // add comma if more than one position, and not at last one
-            html += ", ";
-          }
-        }
-        html += "</h3>";
-        if (currYear == selectedYear) {
-          let firstEmail = true; // in the event of no emails, we dont want to create empty lists
-          for (let j = 0; j < currPositions.length; j++) {
-            for (let k = 0; k < rows("positions").length; k++) {
-              if (currPositions[j] == field(rows("positions")[k], "position")) {
-                if (field(rows("positions")[k], "email") != null) {
-                  if (firstEmail == true) {
-                    html += "<ul>";
-                    firstEmail = false;
-                  }
-                  html += "<li>";
-                  html += `<a class="button link" href="mailto:${field(rows("positions")[k], "email")}">${field(rows("positions")[k], "email")}</a>`;
-                  html += "</li>";
-                }
-                break;
-              }
-            }
-          }
-          if (firstEmail == false) {
-            html += "</ul>";
-          }
-        }
-        html += "</li>";
-      }
+function memberCard(row, titles, showEmail) {
+  let html = `<li class="council-member visible">`;
+  if (field(row, "photo") != null) {
+    html += `<img src="${photo(field(row, "photo"))}" alt="${field(row, "name")}">`;
+  } else {
+    html += `<i class="fa-solid fa-user" aria-hidden="true"></i>`;
+  }
+  html += `<h2>${ordinal(field(row, "name"))}</h2><h3>`;
+  titles.forEach((title, j) => {
+    const role = rows("positions").find((entry) => field(entry, "position") === title);
+    if (role) {
+      html += `<span class="role"><span class="role-name">${ordinal(title)}</span><i class="fa-solid fa-circle-info"><div class="tooltip">${ordinal(field(role, "responsibilities"))}</div></i></span>`;
+    }
+    if (j + 1 < titles.length) html += ", ";
+  });
+  html += `</h3>`;
+  if (showEmail) {
+    const emails = [];
+    titles.forEach((title) => {
+      const role = rows("positions").find((entry) => field(entry, "position") === title);
+      const address = role ? field(role, "email") : null;
+      if (address != null && !emails.includes(address)) emails.push(address);
+    });
+    if (emails.length) {
+      html += `<ul>${emails.map((address) => `<li><a class="button link" href="mailto:${address}">${address}</a></li>`).join("")}</ul>`;
     }
   }
-  document.getElementById("council-grid").innerHTML = html;
+  html += `</li>`;
+  return html;
 }
 
-function makeOpenings() {
+function renderPeople() {
+  const years = councilYears();
+  const latest = years[0] ?? null;
+  let html = "";
+  years.forEach((year) => {
+    let cards = "";
+    for (let p = 0; p < rows("positions").length; p++) {
+      for (let i = 0; i < rows("council").length; i++) {
+        if (field(rows("council")[i], "year") == null) break;
+        const currYear = Number(field(rows("council")[i], "year").split("/")[0]);
+        if (Number.isNaN(currYear)) continue;
+        const titles = field(rows("council")[i], "position").split(", ");
+        if (currYear == year && titles[0] == field(rows("positions")[p], "position")) {
+          cards += memberCard(rows("council")[i], titles, year == latest);
+        }
+      }
+    }
+    if (!cards) return;
+    html += `<section class="council-year"><h2>${year}–${year + 1}</h2><ul>${cards}</ul></section>`;
+  });
+  document.getElementById("people").innerHTML = html;
+}
+
+function renderRoles() {
   let execHTML = "";
   let exoHTML = "";
   let posCount = 0;
@@ -120,18 +103,20 @@ function makeOpenings() {
     else exoHTML += item;
   }
   if (posCount == 0) {
-    execHTML = `<li><div class="no-entries">No openings right now. Check back later!</div></li>`;
+    execHTML = `<li><div class="empty-note">No open roles at the moment.</div></li>`;
   }
-  document.getElementById("exec-openings").innerHTML = execHTML;
-  document.getElementById("exo-openings").innerHTML = exoHTML;
+  const execList = document.getElementById("role-exec");
+  const exoList = document.getElementById("role-other");
+  execList.innerHTML = execHTML;
+  exoList.innerHTML = exoHTML;
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   boot();
   load("socials").then(paintIcons);
   load(["council", "positions"]).then(() => {
-    makeCouncilGrid();
-    makeOpenings();
+    renderPeople();
+    renderRoles();
     startContactForm();
     placeTips();
   });
