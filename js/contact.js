@@ -1,25 +1,34 @@
 import {
-  data,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  makeSocials,
-  commonInit,
-} from "../app.js";
-
-// CONTACT
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
 
 function makeContactOptions() {
   let html = `<option value="" selected disabled>Select Topic</option>`;
-  for (let i = 0; i < data.contacts.length; i++) {
+  for (let i = 0; i < rows("contacts").length; i++) {
     if (
-      getCell("contacts", i, "option") == null ||
-      getCell("contacts", i, "show") == false
+      field(rows("contacts")[i], "option") == null ||
+      field(rows("contacts")[i], "show") == false
     ) {
       continue;
     } // skip blank entries
-    html += `<option value="${getCell("contacts", i, "option")}">${getCell("contacts", i, "option")}</option>`;
+    html += `<option value="${field(rows("contacts")[i], "option")}">${field(rows("contacts")[i], "option")}</option>`;
   }
 
   document.getElementById("form-key").setAttribute("value", "");
@@ -46,29 +55,29 @@ function updateContactForm() {
   }
 
   let key;
-  for (let i = 0; i < data.contacts.length; i++) {
+  for (let i = 0; i < rows("contacts").length; i++) {
     if (
-      getCell("contacts", i, "option") == null ||
-      getCell("contacts", i, "show") == false
+      field(rows("contacts")[i], "option") == null ||
+      field(rows("contacts")[i], "show") == false
     ) {
       continue;
     } // skip blank entries
-    if (getCell("contacts", i, "option") == type) {
+    if (field(rows("contacts")[i], "option") == type) {
       let searchEmail =
-        getCell("contacts", i, "override") != null
-          ? getCell("contacts", i, "override")
-          : getCell("contacts", i, "email") != null
-            ? getCell("contacts", i, "email")
-            : getCell("contacts", 0, "email"); // take preference for override, otherwise use regular email, if both blank, default to first entry
-      for (let j = 0; j < data.positions.length; j++) {
+        field(rows("contacts")[i], "override") != null
+          ? field(rows("contacts")[i], "override")
+          : field(rows("contacts")[i], "email") != null
+            ? field(rows("contacts")[i], "email")
+            : field(rows("contacts")[0], "email"); // take preference for override, otherwise use regular email, if both blank, default to first entry
+      for (let j = 0; j < rows("positions").length; j++) {
         if (
-          getCell("positions", j, "email") != null &&
-          getCell("positions", j, "email") == searchEmail
+          field(rows("positions")[j], "email") != null &&
+          field(rows("positions")[j], "email") == searchEmail
         ) {
           key =
-            getCell("positions", j, "key") != null
-              ? getCell("positions", j, "key")
-              : getCell("positions", 0, "key"); // lowermost default to president
+            field(rows("positions")[j], "key") != null
+              ? field(rows("positions")[j], "key")
+              : field(rows("positions")[0], "key"); // lowermost default to president
           break;
         }
       }
@@ -81,12 +90,9 @@ function updateContactForm() {
   setSendEnabled(true);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
-  fetchSheet("socials", makeSocials);
-  fetchSheets(["contacts", "positions"], makeContactOptions);
-
+export function startContactForm() {
+  load(["contacts", "positions"]).then(makeContactOptions);
   document.querySelectorAll("#form-type").forEach((el) => {
     el.addEventListener("input", updateContactForm);
   });
-});
+}

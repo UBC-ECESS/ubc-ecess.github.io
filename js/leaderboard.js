@@ -1,35 +1,42 @@
 import {
-  data,
-  POP_IN_DELAY,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  dateToUTC,
-  dateToString,
-  addButtonEvents,
-  commonInit,
-} from "../app.js";
-
-// LEADERBOARD
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
 
 let playerRatings = {};
 let playerNames;
 
 function getParamsAtDate(game, date) {
-  let searchUtc = dateToUTC(date);
+  let searchUtc = sheetUtc(date);
 
   let latestIndex = -1;
   let firstOfGame = true;
 
-  for (let i = 0; i < data.parameters.length; i++) {
+  for (let i = 0; i < rows("parameters").length; i++) {
     if (
-      anyCellNull("parameters", i, ["game", "starts"]) == true ||
-      getCell("parameters", i, "game") != game
+      lacks(rows("parameters")[i], ["game", "starts"]) == true ||
+      field(rows("parameters")[i], "game") != game
     ) {
       continue;
     }
 
-    let paramUtc = dateToUTC(getCell("parameters", i, "starts"));
+    let paramUtc = sheetUtc(field(rows("parameters")[i], "starts"));
 
     if (firstOfGame == true) {
       firstOfGame = false;
@@ -44,11 +51,11 @@ function getParamsAtDate(game, date) {
 
 function setPlayerNames() {
   playerNames = new Map();
-  for (let i = 0; i < data.players.length; i++) {
-    if (anyCellNull("players", i, ["id", "name"]) == true) {
+  for (let i = 0; i < rows("players").length; i++) {
+    if (lacks(rows("players")[i], ["id", "name"]) == true) {
       continue;
     }
-    playerNames.set(getCell("players", i, "id"), getCell("players", i, "name"));
+    playerNames.set(field(rows("players")[i], "id"), field(rows("players")[i], "name"));
   }
 }
 
@@ -61,11 +68,8 @@ function minMaxLerp(a, b, t) {
 
 function getPlayerRating(game, id, timestamp) {
   if (playerRatings[game].has(id) == false) {
-    let latestInitRating = getCell(
-      "parameters",
-      getParamsAtDate(game, timestamp),
-      "init_rating",
-    );
+    const paramsRow = rows("parameters")[getParamsAtDate(game, timestamp)];
+    let latestInitRating = field(paramsRow, "init_rating");
     playerRatings[game].set(id, latestInitRating);
   }
   return playerRatings[game].get(id);
@@ -76,36 +80,36 @@ function setPlayerRating(game, id, rating) {
 }
 
 function calculatePlayerRatings() {
-  for (let i = 0; i < data.games.length; i++) {
+  for (let i = 0; i < rows("games").length; i++) {
     if (
-      anyCellNull("games", i, ["name", "system", "starts"]) == true ||
-      dateToUTC(getCell("games", i, "starts")) > Date.now() ||
-      getCell("games", i, "show") == false
+      lacks(rows("games")[i], ["name", "system", "starts"]) == true ||
+      sheetUtc(field(rows("games")[i], "starts")) > Date.now() ||
+      field(rows("games")[i], "show") == false
     ) {
       continue;
     }
-    playerRatings[getCell("games", i, "name")] = new Map();
+    playerRatings[field(rows("games")[i], "name")] = new Map();
   }
 
-  for (let r = 0; r < data.matches.length; r++) {
-    if (getCell("matches", r, "timestamp") == null) {
+  for (let r = 0; r < rows("matches").length; r++) {
+    if (field(rows("matches")[r], "timestamp") == null) {
       continue;
     }
     // get game
-    let game = getCell("matches", r, "game");
-    let timestamp = getCell("matches", r, "timestamp");
+    let game = field(rows("matches")[r], "game");
+    let timestamp = field(rows("matches")[r], "timestamp");
 
     let system = "";
-    for (let i = 0; i < data.games.length; i++) {
+    for (let i = 0; i < rows("games").length; i++) {
       if (
-        getCell("games", i, "name") != null &&
-        getCell("games", i, "name") == game &&
-        getCell("games", i, "show") == true &&
-        getCell("games", i, "system") != null &&
-        getCell("games", i, "starts") != null &&
-        dateToUTC(getCell("games", i, "starts")) <= dateToUTC(timestamp)
+        field(rows("games")[i], "name") != null &&
+        field(rows("games")[i], "name") == game &&
+        field(rows("games")[i], "show") == true &&
+        field(rows("games")[i], "system") != null &&
+        field(rows("games")[i], "starts") != null &&
+        sheetUtc(field(rows("games")[i], "starts")) <= sheetUtc(timestamp)
       ) {
-        system = getCell("games", i, "system");
+        system = field(rows("games")[i], "system");
         break;
       }
     }
@@ -116,19 +120,19 @@ function calculatePlayerRatings() {
     // get player ids
     let ids = [];
     // team A
-    ids[0] = Number(getCell("matches", r, "p1_id")); // P1
+    ids[0] = Number(field(rows("matches")[r], "p1_id")); // P1
     ids[1] =
-      getCell("matches", r, "p2_id") != null
-        ? Number(getCell("matches", r, "p2_id"))
+      field(rows("matches")[r], "p2_id") != null
+        ? Number(field(rows("matches")[r], "p2_id"))
         : 0; // P2
     // team B
     ids[2] =
-      getCell("matches", r, "p3_id") != null
-        ? Number(getCell("matches", r, "p3_id"))
+      field(rows("matches")[r], "p3_id") != null
+        ? Number(field(rows("matches")[r], "p3_id"))
         : 0; // P3
     ids[3] =
-      getCell("matches", r, "p4_id") != null
-        ? Number(getCell("matches", r, "p4_id"))
+      field(rows("matches")[r], "p4_id") != null
+        ? Number(field(rows("matches")[r], "p4_id"))
         : 0; // P4
 
     // get player ratings (or set to init value if new)
@@ -146,7 +150,7 @@ function calculatePlayerRatings() {
     let gameParams = getParamsAtDate(game, timestamp);
 
     if (system == "Best Time") {
-      let time = getCell("matches", r, "time");
+      let time = field(rows("matches")[r], "time");
       if (time < Rs[0]) {
         setPlayerRating(game, ids[0], time);
       }
@@ -154,8 +158,8 @@ function calculatePlayerRatings() {
       let Qs = []; // q values
       for (let i = 0; i < playerCount; i++) {
         Qs[i] = Math.pow(
-          getCell("parameters", gameParams, "base"),
-          Rs[i] / getCell("parameters", gameParams, "divisor"),
+          field(rows("parameters")[gameParams], "base"),
+          Rs[i] / field(rows("parameters")[gameParams], "divisor"),
         );
       }
 
@@ -172,17 +176,17 @@ function calculatePlayerRatings() {
       }
 
       let Ss = [
-        getCell("matches", r, "p1_points") != null
-          ? Number(getCell("matches", r, "p1_points"))
+        field(rows("matches")[r], "p1_points") != null
+          ? Number(field(rows("matches")[r], "p1_points"))
           : 0,
-        getCell("matches", r, "p2_points") != null
-          ? Number(getCell("matches", r, "p2_points"))
+        field(rows("matches")[r], "p2_points") != null
+          ? Number(field(rows("matches")[r], "p2_points"))
           : 0,
-        getCell("matches", r, "p3_points") != null
-          ? Number(getCell("matches", r, "p3_points"))
+        field(rows("matches")[r], "p3_points") != null
+          ? Number(field(rows("matches")[r], "p3_points"))
           : 0,
-        getCell("matches", r, "p4_points") != null
-          ? Number(getCell("matches", r, "p4_points"))
+        field(rows("matches")[r], "p4_points") != null
+          ? Number(field(rows("matches")[r], "p4_points"))
           : 0,
       ]; // actual scores
 
@@ -199,7 +203,7 @@ function calculatePlayerRatings() {
           game,
           ids[i],
           Rs[i] +
-            (getCell("parameters", gameParams, "k") / (playerCount - 1)) * mult,
+            (field(rows("parameters")[gameParams], "k") / (playerCount - 1)) * mult,
         );
       }
     } else if (system == "Elo Teams") {
@@ -207,28 +211,28 @@ function calculatePlayerRatings() {
         minMaxLerp(
           Rs[0],
           Rs[1],
-          getCell("parameters", gameParams, "interpolation"),
+          field(rows("parameters")[gameParams], "interpolation"),
         ),
         minMaxLerp(
           Rs[2],
           Rs[3],
-          getCell("parameters", gameParams, "interpolation"),
+          field(rows("parameters")[gameParams], "interpolation"),
         ),
       ]; // ratings for team A and B
       let Qs = [
         Math.pow(
-          getCell("parameters", gameParams, "base"),
-          Rt[0] / getCell("parameters", gameParams, "divisor"),
+          field(rows("parameters")[gameParams], "base"),
+          Rt[0] / field(rows("parameters")[gameParams], "divisor"),
         ),
         Math.pow(
-          getCell("parameters", gameParams, "base"),
-          Rt[1] / getCell("parameters", gameParams, "divisor"),
+          field(rows("parameters")[gameParams], "base"),
+          Rt[1] / field(rows("parameters")[gameParams], "divisor"),
         ),
       ];
       let Es = [Qs[0] / (Qs[0] + Qs[1]), Qs[1] / (Qs[0] + Qs[1])]; // estimated scores for team A and B
       let Ss = [
-        getCell("matches", r, "winner") == "Team A" ? 1 : 0,
-        getCell("matches", r, "winner") == "Team B" ? 1 : 0,
+        field(rows("matches")[r], "winner") == "Team A" ? 1 : 0,
+        field(rows("matches")[r], "winner") == "Team B" ? 1 : 0,
       ]; // actual scores for team A and B
 
       for (let i = 0; i < 4; i++) {
@@ -239,7 +243,7 @@ function calculatePlayerRatings() {
           game,
           ids[i],
           Rs[i] +
-            getCell("parameters", gameParams, "k") *
+            field(rows("parameters")[gameParams], "k") *
               (Ss[Math.floor(i / 2)] - Es[Math.floor(i / 2)]),
         );
       }
@@ -250,20 +254,20 @@ function calculatePlayerRatings() {
 }
 
 function refreshLeaderboard() {
-  for (let i = 0; i < data.games.length; i++) {
+  for (let i = 0; i < rows("games").length; i++) {
     if (
-      anyCellNull("games", i, ["name", "system", "starts"]) == true ||
-      dateToUTC(getCell("games", i, "starts")) > Date.now() ||
-      getCell("games", i, "show") == false
+      lacks(rows("games")[i], ["name", "system", "starts"]) == true ||
+      sheetUtc(field(rows("games")[i], "starts")) > Date.now() ||
+      field(rows("games")[i], "show") == false
     ) {
       continue;
     }
 
-    let game = getCell("games", i, "name");
-    let system = getCell("games", i, "system");
+    let game = field(rows("games")[i], "name");
+    let system = field(rows("games")[i], "system");
     let rounding =
-      getCell("games", i, "rounding") != null
-        ? Math.round(getCell("games", i, "rounding"))
+      field(rows("games")[i], "rounding") != null
+        ? Math.round(field(rows("games")[i], "rounding"))
         : 0;
     let rankedMap;
 
@@ -289,26 +293,26 @@ let shownGames = [];
 function makeLeaderboardGames() {
   let buttonsHTML = "";
   let boardsHTML = "";
-  for (let i = 0; i < data.games.length; i++) {
+  for (let i = 0; i < rows("games").length; i++) {
     if (
-      anyCellNull("games", i, ["name", "system", "starts"]) == true ||
-      getCell("games", i, "show") == false
+      lacks(rows("games")[i], ["name", "system", "starts"]) == true ||
+      field(rows("games")[i], "show") == false
     ) {
       continue;
     }
 
-    shownGames.push(getCell("games", i, "name"));
+    shownGames.push(field(rows("games")[i], "name"));
 
-    buttonsHTML += `<li><button class="button" id="${getCell("games", i, "name")}-button">`;
-    if (getCell("games", i, "icon") != null) {
-      buttonsHTML += `<i class="fa-solid fa-${getCell("games", i, "icon")}"></i>`;
+    buttonsHTML += `<li><button class="button" id="${field(rows("games")[i], "name")}-button">`;
+    if (field(rows("games")[i], "icon") != null) {
+      buttonsHTML += `<i class="fa-solid fa-${field(rows("games")[i], "icon")}"></i>`;
     }
-    buttonsHTML += `${getCell("games", i, "name")}</button></li>`;
+    buttonsHTML += `${field(rows("games")[i], "name")}</button></li>`;
 
-    boardsHTML += `<ul class="leaderboard-container" id="${getCell("games", i, "name")}-board" style="display: none;">`;
+    boardsHTML += `<ul class="leaderboard-container" id="${field(rows("games")[i], "name")}-board" style="display: none;">`;
 
-    if (dateToUTC(getCell("games", i, "starts")) > Date.now()) {
-      boardsHTML += `<li class="player-card message"><div>This leaderboard starts on ${dateToString(getCell("games", i, "starts"))}!</div></li>`;
+    if (sheetUtc(field(rows("games")[i], "starts")) > Date.now()) {
+      boardsHTML += `<li class="player-card message"><div>This leaderboard starts on ${writtenDate(field(rows("games")[i], "starts"))}!</div></li>`;
     }
 
     boardsHTML += `</ul>`;
@@ -324,7 +328,7 @@ function makeLeaderboardGames() {
       });
     });
 
-  addButtonEvents();
+  wireIcons();
 }
 
 function makeLeaderboardHTML(values, keys, round) {
@@ -352,7 +356,7 @@ function makeLeaderboardHTML(values, keys, round) {
       tieCount++;
     }
 
-    html += `<li class="player-card" style="animation-delay: ${i * POP_IN_DELAY}ms;"><div class="rank r${i + 1}">${i + 1}</div><div class="name">${playerName}</div><div class="rating">${rating.toFixed(Math.max(-round, 0))}</div></li>`;
+    html += `<li class="player-card"><div class="rank r${i + 1}">${i + 1}</div><div class="name">${playerName}</div><div class="rating">${rating.toFixed(Math.max(-round, 0))}</div></li>`;
 
     i += tieCount;
   }
@@ -393,7 +397,6 @@ function filterSearch() {
         let name = nameObj.innerHTML;
         if (name.toUpperCase().indexOf(input) > -1) {
           cards[i].style.display = "";
-          cards[i].style = `animation-delay: ${cardIdx * POP_IN_DELAY}ms`;
           cardIdx++;
         }
       }, 1);
@@ -402,19 +405,19 @@ function filterSearch() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit({ injectNav: false });
-  fetchSheets(["games", "players", "matches", "parameters"], () => {
+  boot({ injectNav: false });
+  load(["games", "players", "matches", "parameters"]).then(() => {
     makeLeaderboardGames();
     setPlayerNames();
     calculatePlayerRatings();
     let currentBoard =
       localStorage.currentBoard != null
         ? localStorage.currentBoard
-        : getCell("games", 0, "name");
+        : field(rows("games")[0], "name");
     try {
       changeLeaderboard(currentBoard);
     } catch (error) {
-      changeLeaderboard(getCell("games", 0, "name"));
+      changeLeaderboard(field(rows("games")[0], "name"));
     }
   });
 

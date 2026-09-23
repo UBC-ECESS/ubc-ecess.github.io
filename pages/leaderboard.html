@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- META TAGS -->
+	<title>UBC ECESS | Leaderboard</title>
+	<meta charset="UTF-8" />
+	<meta name="description" content="A ranked leaderboard for all of the games available in ECESS – updated live!" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<!-- FAVICONS -->
+	<link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png" />
+	<link rel="icon" type="image/png" sizes="128x128" href="../favicon/favicon-128x128.png" />
+	<link rel="icon" type="image/png" sizes="192x192" href="../favicon/android-chrome-192x192.png" />
+	<link rel="icon" type="image/png" sizes="512x512" href="../favicon/android-chrome-512x512.png" />
+	<link rel="apple-touch-icon" type="image/png" href="../favicon/apple-touch-icon.png" />
+	<link rel="icon" type="image/x-icon" href="../favicon/favicon.ico" />
+	<link rel="manifest" href="../favicon/manifest.webmanifest" />
+	<!-- STYLING -->
+	<link rel="stylesheet" href="../styles.css?version=23" />
+	<link rel="stylesheet" href="../css/leaderboard.css?version=5" />
+	<link href="../assets/css/fontawesome.css" rel="stylesheet" />
+	<link href="../assets/css/solid.css" rel="stylesheet" />
+	<link href="../assets/css/brands.css" rel="stylesheet" />
+</head>
+
+<body id="leaderboard-page" tabindex="0">
+	<div id="reload-indicator"></div>
+	<nav id="nav">
+		<a class="button nav icon" href="."><i class="fa-solid fa-chevron-left"></i></a>
+		<a class="button link"
+			href="https://docs.google.com/document/d/185WJQyOSXew63BxwodiHwZ991PI5MIcIjLlmh0p7wbM/edit?tab=t.0#heading=h.69kg4tut87og"
+			target="_blank" style="flex-grow: 0;"><i class="fa-solid fa-book"></i>Rules</a>
+	</nav>
+	<div id="content">
+		<div class="board-head">
+			<p class="board-kicker">MCLD 3005</p>
+			<h1>Leaderboard</h1>
+		</div>
+		<div class="board-layout">
+			<ul id="leaderboard-games"></ul>
+			<div class="board-main">
+				<input class="search-box" type="text" placeholder="Find a name" id="leaderboard-search">
+				<div id="leaderboards"></div>
+			</div>
+		</div>
+	</div>
+	<script type="module" src="../js/leaderboard.js?version=7"></script>
+</body>
+
+</html>

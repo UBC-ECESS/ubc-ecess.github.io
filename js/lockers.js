@@ -1,15 +1,13 @@
 import {
-  data,
-  fetchSheet,
-  getCell,
-  anyCellNull,
-  driveUrlToThumb,
-  makeSocials,
-  makeSheetUrl,
-  commonInit,
-} from "../app.js";
-
-// LOCKERS
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  photo,
+  boot,
+  paintIcons,
+} from "../app.js?version=7";
 
 // Physical MCLD Banks: 2 Rows, Evens on Top, Odds on Bottom, Higher Numbers on the Left
 const LOCKER_SECTIONS = {
@@ -51,7 +49,7 @@ const LOCKER_CELL_MAX = 100;
  * Redraws Cards / Floor Grid after Availability Data Changes.
  */
 function renderLockers() {
-  if (!lockersReady || !data.sets || data.sets.length == 0) return;
+  if (!lockersReady || !rows("sets") || rows("sets").length == 0) return;
 
   makeLockers();
   if (document.getElementById("locker-detail").style.display != "none") {
@@ -59,24 +57,9 @@ function renderLockers() {
   }
 }
 
-/*
- * Parses a Google Sheets gviz Response into Rows.
- */
-function rowsFromGviz(text) {
-  return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
-}
-
-/*
- * Loads Fresh Taken/Free Data from the Public Lockers Sheet.
- * Bypasses the localStorage Cache and Browser Cache so Assignments Show Up Quickly.
- */
 function refreshLockerAvailability() {
-  const url = makeSheetUrl("lockers") + "&t=" + Date.now();
-
-  return fetch(url, { cache: "no-store" })
-    .then((res) => res.text())
-    .then((text) => {
-      data.lockers = rowsFromGviz(text);
+  return reload("lockers")
+    .then(() => {
       lockersReady = true;
       renderLockers();
     })
@@ -97,12 +80,12 @@ function startAvailabilityPolling() {
  * Returns Taken Status for One Locker Number in a Set.
  */
 function getLockerTaken(setName, number) {
-  for (let i = 0; i < data.lockers.length; i++) {
+  for (let i = 0; i < rows("lockers").length; i++) {
     if (
-      getCell("lockers", i, "set") == setName &&
-      Number(getCell("lockers", i, "number")) == number
+      field(rows("lockers")[i], "set") == setName &&
+      Number(field(rows("lockers")[i], "number")) == number
     ) {
-      return getCell("lockers", i, "taken") == true;
+      return field(rows("lockers")[i], "taken") == true;
     }
   }
   return null;
@@ -113,11 +96,11 @@ function getLockerTaken(setName, number) {
  */
 function countFreeLockers(setName) {
   let freeCount = 0;
-  for (let i = 0; i < data.lockers.length; i++) {
+  for (let i = 0; i < rows("lockers").length; i++) {
     if (
-      getCell("lockers", i, "set") == setName &&
-      getCell("lockers", i, "number") != null &&
-      getCell("lockers", i, "taken") == false
+      field(rows("lockers")[i], "set") == setName &&
+      field(rows("lockers")[i], "number") != null &&
+      field(rows("lockers")[i], "taken") == false
     ) {
       freeCount++;
     }
@@ -236,36 +219,27 @@ function makeLockers() {
   visibleFloors = [];
   let html = "";
 
-  for (let i = 0; i < data.sets.length; i++) {
+  for (let i = 0; i < rows("sets").length; i++) {
     if (
-      getCell("sets", i, "name") == null ||
-      getCell("sets", i, "show") == false
+      field(rows("sets")[i], "name") == null ||
+      field(rows("sets")[i], "show") == false
     ) {
       continue;
     }
 
     visibleFloors.push(i);
-    const name = getCell("sets", i, "name");
+    const name = field(rows("sets")[i], "name");
     const freeCount = countFreeLockers(name);
 
     html += `<li class="locker">`;
     html += `<button type="button" class="locker-open" data-set-index="${i}" aria-label="View ${name} lockers">`;
-
-    if (getCell("sets", i, "image") != null) {
-      html += `<img class="locker-map" src="${driveUrlToThumb(getCell("sets", i, "image"))}" alt="${name} map">`;
-    }
-
+    html += `<span class="locker-place">${field(rows("sets")[i], "location") || ""}</span>`;
     html += `<h2>${name}</h2>`;
-    html += `<div class="locker-card-meta">`;
-    if (getCell("sets", i, "location") != null) {
-      html += `<span class="info"><i class="fa-solid fa-location-dot"></i>${getCell("sets", i, "location")}</span>`;
-    }
     html += `<span class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} Available</span>`;
-    html += `</div>`;
-    html += `<span class="locker-card-cta"><i class="fa-solid fa-table-cells"></i>View Lockers</span>`;
+    html += `<span class="locker-card-cta">View</span>`;
     html += `</button>`;
 
-    if (getCell("sets", i, "unavailable") == true) {
+    if (field(rows("sets")[i], "unavailable") == true) {
       html += `<div class="unavailable"><i class="fa-solid fa-circle-xmark"></i>Temporarily Unavailable</div>`;
     }
 
@@ -308,8 +282,8 @@ function closeFloorLayout() {
  */
 function renderFloorLayout() {
   const setIndex = visibleFloors[currentFloorIdx];
-  const name = getCell("sets", setIndex, "name");
-  const floorUnavailable = getCell("sets", setIndex, "unavailable") == true;
+  const name = field(rows("sets")[setIndex], "name");
+  const floorUnavailable = field(rows("sets")[setIndex], "unavailable") == true;
   const sections = LOCKER_SECTIONS[name] || [];
   const freeCount = countFreeLockers(name);
 
@@ -326,6 +300,9 @@ function renderFloorLayout() {
   html += `<span class="availability${freeCount == 0 ? " none-left" : freeCount < 5 ? " running-low" : ""}">${freeCount} Available</span>`;
   html += `</div>`;
   html += `</div>`;
+  if (field(rows("sets")[setIndex], "image") != null) {
+    html += `<img class="locker-map" src="${photo(field(rows("sets")[setIndex], "image"))}" alt="" referrerpolicy="no-referrer">`;
+  }
 
   currentMaxCols = 1;
   for (let i = 0; i < sections.length; i++) {
@@ -385,12 +362,12 @@ function bindFloorLayout() {
  * Embeds the Locker Form from the Links Sheet Row Named "Locker Form".
  */
 function makeLockerForm() {
-  for (let i = 0; i < data.links.length; i++) {
-    if (anyCellNull("links", i, ["name", "link"]) == true || getCell("links", i, "show") == false) {
+  for (let i = 0; i < rows("links").length; i++) {
+    if (lacks(rows("links")[i], ["name", "link"]) == true || field(rows("links")[i], "show") == false) {
       continue;
     }
-    const name = String(getCell("links", i, "name")).trim();
-    const link = String(getCell("links", i, "link")).trim();
+    const name = String(field(rows("links")[i], "name")).trim();
+    const link = String(field(rows("links")[i], "link")).trim();
     if (name == "Locker Form") {
       lockerFormTemplate = link;
     }
@@ -408,12 +385,9 @@ function makeLockerForm() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
+  boot();
   watchLockerResize();
-  fetchSheet("socials", makeSocials);
-  fetchSheet("links", () => {
-    makeLockerForm();
-    refreshLockerAvailability().then(startAvailabilityPolling);
-  });
-  fetchSheet("sets", renderLockers);
+  load("socials").then(paintIcons);
+  load("links").then(makeLockerForm);
+  load("sets").then(() => refreshLockerAvailability().then(startAvailabilityPolling));
 });

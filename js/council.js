@@ -1,84 +1,70 @@
 import {
-  data,
-  POP_IN_VARIANCE,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  driveUrlToThumb,
-  replaceOrdinals,
-  makeSocials,
-  handleAllTooltips,
-  commonInit,
-} from "../app.js";
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
+import { startContactForm } from "./contact.js?version=10";
 
-// COUNCIL
-
-let councilYears = [];
-
-function makeYearSelect() {
-  let yearsSet = new Set();
-  for (let i = 0; i < data.council.length; i++) {
-    // loops through council entries and gets the most recent year
-    if (getCell("council", i, "year") == null) {
-      break;
-    } // skip blank entries
-    let currYear = Number(getCell("council", i, "year").split("/")[0]);
-    if (isNaN(currYear) == true) {
-      continue;
-    } //! FOR SOME REASON, HEADER IS GETTING FETCHED TOO
-    yearsSet.add(currYear);
+function latestCouncilYear() {
+  let latest = null;
+  for (let i = 0; i < rows("council").length; i++) {
+    if (field(rows("council")[i], "year") == null) break;
+    const currYear = Number(field(rows("council")[i], "year").split("/")[0]);
+    if (Number.isNaN(currYear)) continue;
+    if (latest == null || currYear > latest) latest = currYear;
   }
-
-  councilYears = [];
-  for (let el of yearsSet) {
-    councilYears.push(el);
-  }
-
-  councilYears = councilYears.sort().reverse();
-
-  let selectHTML = "";
-  for (let i = 0; i < councilYears.length; i++) {
-    selectHTML += `<option value="${councilYears[i]}">${councilYears[i]}–${councilYears[i] + 1}</option>`;
-  }
-  document.getElementById("council-year").innerHTML = selectHTML;
+  return latest;
 }
 
 function makeCouncilGrid() {
-  let selectObj = document.getElementById("council-year");
-  let selectedYear = selectObj.options[selectObj.selectedIndex].value;
+  const selectedYear = latestCouncilYear();
 
   let html = "";
-  for (let p = 0; p < data.positions.length; p++) {
+  for (let p = 0; p < rows("positions").length; p++) {
     // looping through the positions sheet allows for heirarchical ordering even if the 'Council' sheet entries are out of order
-    for (let i = 0; i < data.council.length; i++) {
-      if (getCell("council", i, "year") == null) {
+    for (let i = 0; i < rows("council").length; i++) {
+      if (field(rows("council")[i], "year") == null) {
         break;
       } // skip blank entries
-      let currYear = Number(getCell("council", i, "year").split("/")[0]); // current year
+      let currYear = Number(field(rows("council")[i], "year").split("/")[0]); // current year
       if (isNaN(currYear) == true) {
         continue;
       }
-      let currPositions = getCell("council", i, "position").split(", "); // creates an array of positions held by the member
+      let currPositions = field(rows("council")[i], "position").split(", "); // creates an array of positions held by the member
       if (
         currYear == selectedYear &&
-        currPositions[0] == getCell("positions", p, "position")
+        currPositions[0] == field(rows("positions")[p], "position")
       ) {
         // heirarchical ordering done by *first* position in list
-        html += `<li class="council-member visible" style="animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;">`;
+        html += `<li class="council-member visible">`;
 
-        if (getCell("council", i, "photo") != null) {
-          html += `<img src="${driveUrlToThumb(getCell("council", i, "photo"))}" alt="${getCell("council", i, "name")}">`; // photo
+        if (field(rows("council")[i], "photo") != null) {
+          html += `<img src="${photo(field(rows("council")[i], "photo"))}" alt="${field(rows("council")[i], "name")}">`; // photo
         } else {
           html += '<i class="fa-solid fa-user"></i>';
         }
 
-        html += `<h2>${replaceOrdinals(getCell("council", i, "name"))}</h2>`;
+        html += `<h2>${ordinal(field(rows("council")[i], "name"))}</h2>`;
         html += "<h3>";
         for (let j = 0; j < currPositions.length; j++) {
-          for (let k = 0; k < data.positions.length; k++) {
-            if (currPositions[j] == getCell("positions", k, "position")) {
-              html += `<span>${replaceOrdinals(currPositions[j])}<i class="fa-solid fa-circle-info"><div class="tooltip">${replaceOrdinals(getCell("positions", k, "responsibilities"))}</div></i></span>`;
+          for (let k = 0; k < rows("positions").length; k++) {
+            if (currPositions[j] == field(rows("positions")[k], "position")) {
+              html += `<span>${ordinal(currPositions[j])}<i class="fa-solid fa-circle-info"><div class="tooltip">${ordinal(field(rows("positions")[k], "responsibilities"))}</div></i></span>`;
               break;
             }
           }
@@ -88,19 +74,18 @@ function makeCouncilGrid() {
           }
         }
         html += "</h3>";
-        if (currYear == councilYears[0]) {
-          // only list emails for current council
+        if (currYear == selectedYear) {
           let firstEmail = true; // in the event of no emails, we dont want to create empty lists
           for (let j = 0; j < currPositions.length; j++) {
-            for (let k = 0; k < data.positions.length; k++) {
-              if (currPositions[j] == getCell("positions", k, "position")) {
-                if (getCell("positions", k, "email") != null) {
+            for (let k = 0; k < rows("positions").length; k++) {
+              if (currPositions[j] == field(rows("positions")[k], "position")) {
+                if (field(rows("positions")[k], "email") != null) {
                   if (firstEmail == true) {
                     html += "<ul>";
                     firstEmail = false;
                   }
                   html += "<li>";
-                  html += `<a class="button link" href="mailto:${getCell("positions", k, "email")}">${getCell("positions", k, "email")}</a>`;
+                  html += `<a class="button link" href="mailto:${field(rows("positions")[k], "email")}">${field(rows("positions")[k], "email")}</a>`;
                   html += "</li>";
                 }
                 break;
@@ -118,16 +103,37 @@ function makeCouncilGrid() {
   document.getElementById("council-grid").innerHTML = html;
 }
 
+function makeOpenings() {
+  let execHTML = "";
+  let exoHTML = "";
+  let posCount = 0;
+  for (let i = 0; i < rows("positions").length; i++) {
+    if (
+      lacks(rows("positions")[i], ["position", "type", "responsibilities"]) == true ||
+      field(rows("positions")[i], "open") == false
+    ) {
+      continue;
+    }
+    posCount++;
+    const item = `<li><div>${ordinal(field(rows("positions")[i], "position"))}</div><i class="fa-solid fa-circle-info"><div class="tooltip">${field(rows("positions")[i], "responsibilities")}</div></i></li>`;
+    if (field(rows("positions")[i], "type") == "Executive") execHTML += item;
+    else exoHTML += item;
+  }
+  if (posCount == 0) {
+    execHTML = `<li><div class="no-entries">No openings right now. Check back later!</div></li>`;
+  }
+  document.getElementById("exec-openings").innerHTML = execHTML;
+  document.getElementById("exo-openings").innerHTML = exoHTML;
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
-  fetchSheet("socials", makeSocials);
-  fetchSheets(["council", "positions"], () => {
-    makeYearSelect();
+  boot();
+  load("socials").then(paintIcons);
+  load(["council", "positions"]).then(() => {
     makeCouncilGrid();
-    handleAllTooltips();
+    makeOpenings();
+    startContactForm();
+    placeTips();
   });
 
-  document.querySelectorAll("#council-year").forEach((el) => {
-    el.addEventListener("input", makeCouncilGrid);
-  });
 });

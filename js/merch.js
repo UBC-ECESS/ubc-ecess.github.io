@@ -1,25 +1,32 @@
 import {
-  data,
-  POP_IN_VARIANCE,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  driveUrlToThumb,
-  makeSocials,
-  commonInit,
-} from "../app.js";
-
-// MERCH
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
 
 function makeMerchCategories() {
   let html = "";
 
   let firstCategory = true;
-  for (let i = 0; i < data.categories.length; i++) {
+  for (let i = 0; i < rows("categories").length; i++) {
     if (
-      getCell("categories", i, "name") == null ||
-      getCell("categories", i, "show") == false
+      field(rows("categories")[i], "name") == null ||
+      field(rows("categories")[i], "show") == false
     ) {
       continue;
     }
@@ -31,13 +38,13 @@ function makeMerchCategories() {
       html += " selected";
     }
 
-    html += `" id="${getCell("categories", i, "name")}-button">`;
+    html += `" id="${field(rows("categories")[i], "name")}-button">`;
 
-    if (getCell("categories", i, "icon") != null) {
-      html += `<i class="fa-solid fa-${getCell("categories", i, "icon")}"></i>`;
+    if (field(rows("categories")[i], "icon") != null) {
+      html += `<i class="fa-solid fa-${field(rows("categories")[i], "icon")}"></i>`;
     }
 
-    html += `${getCell("categories", i, "name")}</button></li>`;
+    html += `${field(rows("categories")[i], "name")}</button></li>`;
   }
 
   document.getElementById("merch-categories").innerHTML = html;
@@ -52,39 +59,39 @@ function makeMerchCategories() {
 function makeMerch() {
   let html = "";
 
-  for (let i = 0; i < data.merch.length; i++) {
+  for (let i = 0; i < rows("merch").length; i++) {
     if (
-      anyCellNull("merch", i, ["item", "price", "category"]) == true ||
-      getCell("merch", i, "show") == false
+      lacks(rows("merch")[i], ["item", "price", "category"]) == true ||
+      field(rows("merch")[i], "show") == false
     ) {
       continue;
     } // skip blank entries
 
-    html += `<li class="merch-item ${getCell("merch", i, "category")}" style="animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;">`;
+    html += `<li class="merch-item ${field(rows("merch")[i], "category")}">`;
 
-    if (getCell("merch", i, "image") != null) {
-      html += `<img src="${driveUrlToThumb(getCell("merch", i, "image"))}">`;
+    if (field(rows("merch")[i], "image") != null) {
+      html += `<img src="${photo(field(rows("merch")[i], "image"))}">`;
     } else {
       let catIcon = "gear";
-      for (let j = 0; j < data.categories.length; j++) {
+      for (let j = 0; j < rows("categories").length; j++) {
         if (
-          getCell("categories", j, "name") == getCell("merch", i, "category")
+          field(rows("categories")[j], "name") == field(rows("merch")[i], "category")
         ) {
-          catIcon = getCell("categories", j, "icon");
+          catIcon = field(rows("categories")[j], "icon");
         }
       }
       html += `<i class="fa-solid fa-${catIcon}"></i>`;
     }
 
-    html += `<h2>${getCell("merch", i, "item")}</h2>`;
-    html += `<div><div class="price">$${Number(getCell("merch", i, "price")).toFixed(2)}</div>`;
+    html += `<h2>${field(rows("merch")[i], "item")}</h2>`;
+    html += `<div><div class="price">$${Number(field(rows("merch")[i], "price")).toFixed(2)}</div>`;
 
     let stock =
-      getCell("merch", i, "stock") == null
+      field(rows("merch")[i], "stock") == null
         ? ""
-        : getCell("merch", i, "stock").replaceAll(" ", "").split(",");
-    if (getCell("merch", i, "sizes") != null) {
-      let sizes = getCell("merch", i, "sizes").split(", ");
+        : field(rows("merch")[i], "stock").replaceAll(" ", "").split(",");
+    if (field(rows("merch")[i], "sizes") != null) {
+      let sizes = field(rows("merch")[i], "sizes").split(", ");
 
       html += '<ul class="sizes">';
       for (let j = 0; j < sizes.length; j++) {
@@ -111,14 +118,14 @@ function filterMerch(category) {
   let merchItems = document.querySelectorAll(".merch-item");
 
   let defaultCategory;
-  for (let i = 0; i < data.categories.length; i++) {
+  for (let i = 0; i < rows("categories").length; i++) {
     if (
-      getCell("categories", i, "name") == null ||
-      getCell("categories", i, "show") == false
+      field(rows("categories")[i], "name") == null ||
+      field(rows("categories")[i], "show") == false
     ) {
       continue;
     }
-    defaultCategory = getCell("categories", i, "name");
+    defaultCategory = field(rows("categories")[i], "name");
     break;
   }
 
@@ -137,8 +144,6 @@ function filterMerch(category) {
         category == defaultCategory ||
         merchItems[i].classList.contains(category)
       ) {
-        merchItems[i].style =
-          `animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;`;
         merchItems[i].style.display = "";
       }
     }, 1);
@@ -154,9 +159,9 @@ function filterMerch(category) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
-  fetchSheet("socials", makeSocials);
-  fetchSheets(["merch", "categories"], () => {
+  boot();
+  load("socials").then(paintIcons);
+  load(["merch", "categories"]).then(() => {
     makeMerchCategories();
     makeMerch();
   });

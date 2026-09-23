@@ -1,13 +1,11 @@
-/* COUNCIL */
-
 #council-grid {
 	display: grid;
-	width: var(--grid-width);
-	grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+	width: var(--board);
+	grid-template-columns: repeat(var(--board-cols), minmax(0, 1fr));
 	grid-template-rows: auto;
-	column-gap: var(--grid-col-gap);
-	row-gap: var(--grid-row-gap);
-	margin-top: var(--grid-margin-top);
+	column-gap: var(--board-gap);
+	row-gap: var(--board-row);
+	margin-top: 1.75rem;
 	padding: 0;
 	list-style: none;
 }
@@ -17,19 +15,19 @@
 }
 
 .council-member img {
-	border-radius: var(--border-radius);
+	border-radius: var(--radius);
 	object-fit: cover;
 	width: 100%;
 	aspect-ratio: 1 / 1;
 }
 
 .council-member>i {
-	background-color: var(--secondary);
-	color: var(--background);
-	font-size: calc(var(--grid-col-width) * 0.6);
+	background-color: var(--wash);
+	color: var(--canvas);
+	font-size: calc(var(--board-col) * 0.6);
 	width: 100%;
 	aspect-ratio: 1 / 1;
-	border-radius: var(--border-radius);
+	border-radius: var(--radius);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -38,13 +36,13 @@
 
 .council-member h2 {
 	/* name */
-	font-size: var(--h4-size);
-	margin: var(--item-name-margin);
+	font-size: var(--subhead);
+	margin: var(--name-gap);
 }
 
 .council-member h3 {
 	/* position */
-	font-size: var(--h5-size);
+	font-size: var(--kicker);
 	font-weight: 400;
 	margin: 0;
 }
@@ -54,9 +52,9 @@
 }
 
 .council-member h3 i {
-	margin-left: var(--icon-margin);
-	font-size: var(--body-size);
-	color: var(--primary-20);
+	margin-left: var(--icon-gap);
+	font-size: var(--text-size);
+	color: var(--ece-20);
 }
 
 .council-member ul {
@@ -66,7 +64,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
-	gap: var(--gap-width);
+	gap: var(--gap);
 	flex-wrap: wrap;
 }
 
@@ -77,5 +75,145 @@
 }
 
 .council-member .button.link {
-	padding: var(--thin-padding);
+	padding: var(--pad-sm);
+}
+
+#council-page #content {
+	align-items: stretch;
+}
+
+#hiring,
+#council-page #contact {
+	width: min(100% - 2rem, var(--measure));
+	margin: 0.75rem auto 0;
+}
+
+#council-page #contact {
+	padding: 1.15rem 1.35rem 1.25rem;
+	background: hsl(202, 38%, 96%);
+	border: 1px solid hsl(202, 28%, 80%);
+	box-sizing: border-box;
+}
+
+#council-page #contact h2,
+#hiring h2 {
+	margin: 0 0 0.4rem;
+	font-size: var(--subhead);
+	text-align: left;
+}
+
+#council-page .contact-intro {
+	margin-bottom: 0.85rem;
+}
+
+#council-page .form-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem 1.25rem;
+}
+
+#council-page .form-wide {
+	grid-column: 1 / -1;
+}
+
+@media (max-width: 800px) {
+	#council-page .form-container {
+		grid-template-columns: 1fr;
+	}
+}
+
+#hiring > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 1.25rem;
+}
+
+.openings {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.75rem;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.openings:not(:has(:first-child)) {
+	display: none;
+}
+
+.openings li:not(:has(.no-entries)) {
+	display: flex;
+	align-items: center;
+	border-left: 3px solid var(--ece-20);
+	padding: 0.35rem 0.7rem;
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.92rem;
+}
+
+.openings li > i {
+	color: var(--ece-20);
+	margin-left: 0.45rem;
+}
+
+.no-entries {
+	padding: 0.6rem 0;
+}
+
+#council-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+	width: min(100% - 2rem, var(--measure));
+	margin: 1.5rem auto 2.5rem;
+	gap: 1.75rem 1.25rem;
+	align-self: stretch;
+}
+
+.council-member {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.35rem;
+	padding: 0;
+	border: none;
+}
+
+.council-member img,
+.council-member > i {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	object-position: center 15%;
+	border-radius: 0;
+	font-size: 3rem;
+}
+
+.council-member h2,
+.council-member h3 {
+	margin: 0;
+}
+
+.council-member h2 {
+	font-size: 1.05rem;
+}
+
+.council-member ul {
+	margin: 0.1rem 0 0;
+}
+
+.council-member .button.link {
+	border: none;
+	background: none;
+	padding: 0;
+	border-radius: 0;
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.78rem;
+	text-decoration: underline;
+	text-underline-offset: 0.18em;
+}
+
+.council-member .button.link:hover {
+	background: none;
+	color: var(--ink);
 }

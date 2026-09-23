@@ -1,18 +1,23 @@
 import {
-  data,
-  POP_IN_VARIANCE,
-  fetchSheet,
-  fetchSheets,
-  getCell,
-  anyCellNull,
-  dateToUTC,
-  dateToString,
-  driveUrlToThumb,
-  driveUrlToPreview,
-  makeSocials,
-  addButtonEvents,
-  commonInit,
-} from "../app.js";
+  load,
+  reload,
+  rows,
+  field,
+  lacks,
+  present,
+  photo,
+  embed,
+  endpoint,
+  ingest,
+  sheetUtc,
+  writtenDate,
+  ordinal,
+  paintIcons,
+  placeTips,
+  wireIcons,
+  boot,
+  CONFIG,
+} from "../app.js?version=7";
 
 /*
  * Add/Remove Entries to Update Alumni Marquee
@@ -90,51 +95,13 @@ function makeAlumniLogos() {
 }
 
 /*
- * Returns the Contacts Row Index for a Named Option, or -1 if Missing
- */
-function findContactIndex(option) {
-  for (let i = 0; i < data.contacts.length; i++) {
-    if (getCell("contacts", i, "option") == option) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-/*
- * Looks Up the Web3Forms Access Key for a Contacts Row
- * Prefers Override Email, Then Regular Email, Then the First Contact
- */
-function getContactKey(contactIdx) {
-  if (contactIdx < 0) {
-    return "";
-  }
-  let searchEmail =
-    getCell("contacts", contactIdx, "override") != null
-      ? getCell("contacts", contactIdx, "override")
-      : getCell("contacts", contactIdx, "email") != null
-        ? getCell("contacts", contactIdx, "email")
-        : getCell("contacts", 0, "email"); // Prefer Override, Then Regular Email, Then First Contact
-  for (let j = 0; j < data.positions.length; j++) {
-    if (getCell("positions", j, "email") == searchEmail) {
-      let key =
-        getCell("positions", j, "key") != null
-          ? getCell("positions", j, "key")
-          : getCell("positions", 0, "key"); // Fall Back to First Position Key
-      return key?.trim() ?? "";
-    }
-  }
-  return "";
-}
-
-/*
  * Parses a Sheet Date Cell to UTC ms, or null if Blank / Unreadable
  */
 function sheetDateUTC(value) {
   if (value == null || value === "") return null;
   try {
     if (String(value).indexOf("Date(") != -1) {
-      return dateToUTC(value);
+      return sheetUtc(value);
     }
     const parsed = Date.parse(value);
     return isNaN(parsed) ? null : parsed;
@@ -150,7 +117,7 @@ function sheetDateLabel(value) {
   if (value == null || value === "") return null;
   try {
     if (String(value).indexOf("Date(") != -1) {
-      return dateToString(value);
+      return writtenDate(value);
     }
   } catch {
     // Fall Through to Raw String
@@ -179,14 +146,14 @@ function makePostIts() {
 
   const today = Date.now() - 1000 * 60 * 60 * 24;
   const rows = [];
-  for (let i = 0; i < data.external.length; i++) {
+  for (let i = 0; i < rows("external").length; i++) {
     if (
-      getCell("external", i, "show") == false ||
-      getCell("external", i, "name") == null
+      field(rows("external")[i], "show") == false ||
+      field(rows("external")[i], "name") == null
     ) {
       continue;
     }
-    const expiryUtc = sheetDateUTC(getCell("external", i, "expiry"));
+    const expiryUtc = sheetDateUTC(field(rows("external")[i], "expiry"));
     if (expiryUtc != null && expiryUtc < today) {
       continue;
     }
@@ -194,8 +161,8 @@ function makePostIts() {
   }
 
   rows.sort((a, b) => {
-    const da = sheetDateUTC(getCell("external", a, "date")) || 0;
-    const db = sheetDateUTC(getCell("external", b, "date")) || 0;
+    const da = sheetDateUTC(field(rows("external")[a], "date")) || 0;
+    const db = sheetDateUTC(field(rows("external")[b], "date")) || 0;
     return db - da;
   });
 
@@ -208,16 +175,16 @@ function makePostIts() {
   let html = "";
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    const name = getCell("external", row, "name");
-    const description = getCell("external", row, "description");
-    const location = getCell("external", row, "location");
-    const dateLabel = sheetDateLabel(getCell("external", row, "date"));
-    const image = getCell("external", row, "image");
-    const link = getValidUrl(getCell("external", row, "link"));
+    const name = field(rows("external")[row], "name");
+    const description = field(rows("external")[row], "description");
+    const location = field(rows("external")[row], "location");
+    const dateLabel = sheetDateLabel(field(rows("external")[row], "date"));
+    const image = field(rows("external")[row], "image");
+    const link = getValidUrl(field(rows("external")[row], "link"));
 
-    html += `<li class="post-it" style="animation-delay: ${Math.random() * POP_IN_VARIANCE}ms;">`;
+    html += `<li class="post-it">`;
     if (image != null) {
-      html += `<img src="${driveUrlToThumb(image)}" alt="${name}" referrerpolicy="no-referrer">`;
+      html += `<img src="${photo(image)}" alt="${name}" referrerpolicy="no-referrer">`;
     }
     html += `<h3>${name}</h3>`;
     if (description != null) {
@@ -242,7 +209,7 @@ function makePostIts() {
 
   list.innerHTML = html;
   bindPostItExpands();
-  addButtonEvents();
+  wireIcons();
 }
 
 /*
@@ -281,69 +248,15 @@ function descriptionOverflows(el) {
   return overflows;
 }
 
-// SPONSORS
-
-/*
- * Fills the Sponsorship Package, Contact Form Key, and Sponsor Tiers
- */
-function makeSponsors() {
-  document
-    .getElementById("package")
-    .setAttribute(
-      "src",
-      driveUrlToPreview(
-        "https://drive.google.com/file/d/1Qh8cBZtHoSJyGFZhL7a6ypQCqCeue9Qi/view?usp=sharing",
-      ),
-    );
-
-  // Use Sponsorship If Present, Otherwise General
-  let contactIdx = findContactIndex("Sponsorship");
-  if (contactIdx < 0) {
-    contactIdx = findContactIndex("General");
-  }
-  document
-    .getElementById("form-key")
-    .setAttribute("value", getContactKey(contactIdx));
-
-  let html = "";
-  let tiers = ["Titanium", "Steel", "Iron", "Aluminum"];
-  for (let i = 0; i < tiers.length; i++) {
-    html += `<li class=${tiers[i].toLowerCase()}><h3>${tiers[i]}</h3><ul class="sponsors">`;
-    let count = 0;
-    for (let j = 0; j < data.sponsors.length; j++) {
-      if (
-        getCell("sponsors", j, "tier") != tiers[i] ||
-        anyCellNull("sponsors", j, ["name", "logo"]) == true ||
-        getCell("sponsors", j, "show") == false
-      ) {
-        continue;
-      }
-      html += "<li>";
-      let link = getCell("sponsors", j, "link");
-      if (link != null) {
-        html += `<a href="${link}" target="_blank">`;
-      }
-
-      html += `<figure><img src=${driveUrlToThumb(getCell("sponsors", j, "logo"))}><figcaption>${getCell("sponsors", j, "name")}</figcaption></figure>`;
-
-      if (link != null) {
-        html += "</a></li>";
-      }
-      count++;
-    }
-    if (count == 0) {
-      html += '<li class="no-entries">No sponsors in this tier</li>';
-    }
-    html += "</ul></li>";
-  }
-
-  document.getElementById("tiers").innerHTML = html;
-}
-
 window.addEventListener("DOMContentLoaded", () => {
-  commonInit();
+  boot();
   makeAlumniLogos();
-  fetchSheet("socials", makeSocials);
-  fetchSheet("external", makePostIts);
-  fetchSheets(["contacts", "positions", "sponsors"], makeSponsors);
+  const pkg = document.getElementById("package");
+  if (pkg) {
+    pkg.src = embed(
+      "https://drive.google.com/file/d/1Qh8cBZtHoSJyGFZhL7a6ypQCqCeue9Qi/view?usp=sharing",
+    );
+  }
+  load("socials").then(paintIcons);
+  load("external").then(makePostIts);
 });
