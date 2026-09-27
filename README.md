@@ -14,7 +14,7 @@ The official website for the [UBC ECESS](https://www.ecess.ca/). For detailed ma
 
 Dynamic content is fetched from **Google Sheets** documents at runtime using the [Google Visualization Query API](https://developers.google.com/chart/interactive/docs/querylanguage).
 
-> **Note** The fetched data is also cached in `localStorage` so subsequent page visits don't re-fetch everything.
+> **Note** The fetched data is cached in `localStorage` under `ecess-tables-v1`, then refreshed in the background.
 
 ### Sources
 
@@ -25,17 +25,13 @@ Dynamic content is fetched from **Google Sheets** documents at runtime using the
 
 ### Integration
 
-At the top of `app.js`, the `SHEETS` object maps a key name to its sheet tab, document, and expected column order:
+`js/records.js` maps each table to a workbook and tab. `KEYS` lists the field names in column order. Rows are read by the sheet's header label, and by that column order when a header is blank.
 
 ```js
-events: {
-  SHEET: "Events",  // Tab Name
-  DOC: DATABASE_DOC, // Document Constant
-  COLS: ["date", "start", "end", "name", ...], // Column Order
-}
+events: { book: SOCIETY_BOOK, tab: "Events" }
 ```
 
-> **Note:** This site reads each row by **column index**. The order of `COLS` in `app.js` must match the column order in the spreadsheet.
+Page scripts call `load`, `rows`, and `field` from `app.js`. Do not rename a header unless the matching name in `KEYS` is updated too.
 
 ---
 
@@ -53,38 +49,55 @@ Most updates will only require editing the **Google Sheets**.
 
 ### Updates - Code Base
 
-Changing the structure of a sheet will require an update to the `SHEETS` object in `app.js`.
+Changing the structure of a sheet means updating `TABLES` and `KEYS` in `js/records.js`.
 
 | Structural Change | Steps |
 |---|---|
-| Reorder Cols | Update `COLS` Array with New Order |
-| Add New Sheet | Add New Entry to `SHEETS` and Write `make*` Render Function |
+| Rename or reorder a column | Update that table's entry in `KEYS` |
+| Add a sheet | Add it to `TABLES` and `KEYS`, then load it from the page script |
 
 ## For Developers
 
-This is a static site with no build step. The only requirement is **Python 3**. You can install this from the [official website](https://www.python.org/downloads/).
+You need [Node.js](https://nodejs.org/) (npm comes with it).
 
-**1. Check that Python 3 is available:**
-
-```bash
-python3 --version
-```
-
-**2. Clone the repository:**
+**1. Clone the repository:**
 
 ```bash
 git clone https://github.com/UBC-ECESS/ubc-ecess.github.io
 cd ubc-ecess.github.io
 ```
 
-**3. Start a local server:**
+**2. Install dependencies:**
+
+```bash
+npm install
+```
+
+**3. Start the dev server:**
+
+```bash
+npm run dev
+```
+
+**4. Open [http://localhost:5173](http://localhost:5173).**
+
+Page HTML lives in `pages/`. The dev server still opens each one at a short URL: `/`, `/events`, `/courses`, and so on. The server stays on port 5173.
+
+To check the production build:
+
+```bash
+npm run build
+npm run preview
+```
+
+`npm run build` writes the site to `dist/`.
+
+### Python, if you don't want Node
 
 ```bash
 python3 -m http.server 8080
 ```
 
-**4. Open [http://localhost:8080](http://localhost:8080) in your browser.**
-
-> **Note:** When running locally, pages must be accessed with the `.html` suffix (e.g. http://localhost:8080/courses.html)
+Open [http://localhost:8080/pages/index.html](http://localhost:8080/pages/index.html). Other pages are `pages/events.html`, `pages/courses.html`, and so on. Nav links omit `.html`, so use `npm run dev` if you want those short URLs.
 
 ---

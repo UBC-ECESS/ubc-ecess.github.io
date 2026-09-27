@@ -7,7 +7,7 @@
 	flex-direction: row;
 	justify-content: center;
 	align-items: stretch;
-	gap: var(--gap-width);
+	gap: var(--gap);
 	width: 100%;
 	flex-wrap: wrap;
 }
@@ -18,25 +18,25 @@
 
 #course-years li button {
 	width: 100%;
-	padding: var(--thick-padding);
+	padding: var(--pad-lg);
 }
 
 #courses-grid {
 	display: grid;
-	width: var(--grid-width);
-	grid-template-columns: repeat(var(--grid-columns), 1fr);
+	width: var(--frame);
+	grid-template-columns: repeat(var(--frame-cols), 1fr);
 	grid-template-rows: auto;
-	column-gap: var(--grid-col-gap);
-	row-gap: var(--grid-row-gap);
-	margin-top: calc(var(--grid-margin-top) / 2);
+	column-gap: var(--frame-gap);
+	row-gap: var(--frame-row);
+	margin-top: 1.25rem;
 	padding: 0;
 	list-style: none;
 }
 
 .course-item {
-	background-color: var(--secondary);
-	border-radius: var(--border-radius);
-	padding: var(--chunky-padding);
+	background-color: var(--wash);
+	border-radius: var(--radius);
+	padding: var(--pad-xl);
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -46,10 +46,10 @@
 }
 
 .course-item .year-badge {
-	font-size: var(--nav-size);
+	font-size: var(--label-size);
 	font-weight: 600;
-	padding: var(--thin-padding);
-	border-radius: var(--border-radius);
+	padding: var(--pad-sm);
+	border-radius: var(--radius);
 }
 
 .course-item.year-200 .year-badge {
@@ -68,12 +68,12 @@
 }
 
 .course-item h2 {
-	font-size: var(--h4-size);
+	font-size: var(--subhead);
 	margin: 0.2rem 0 0 0;
 }
 
 .course-item h3 {
-	font-size: var(--body-size);
+	font-size: var(--text-size);
 	font-weight: 400;
 	margin: 0;
 	flex-grow: 1;
@@ -81,7 +81,7 @@
 
 .course-item .button.link {
 	margin-top: 0.5rem;
-	padding: var(--thin-padding);
+	padding: var(--pad-sm);
 }
 
 .course-item details.course-resources {
@@ -123,4 +123,219 @@
 .course-item details.course-resources .course-resources-list > div > .button.link {
 	display: block;
 	margin-top: 0;
+}
+
+#courses-layout {
+	width: var(--measure);
+	max-width: 100%;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: 12.5rem minmax(0, 1fr);
+	gap: 1rem 2rem;
+	align-items: start;
+	margin-top: 1.1rem;
+}
+
+#courses-rail {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.35rem;
+	position: sticky;
+	top: calc(var(--bar-height) + 0.75rem);
+}
+
+.courses-rail-label {
+	margin: 0 0 0.15rem;
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ece-20);
+}
+
+#courses-page .rail-link {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	color: var(--ink);
+	text-decoration: none;
+	font-size: 0.92rem;
+	padding: 0.15rem 0;
+}
+
+#courses-page .rail-link:hover {
+	color: var(--ece-20);
+}
+
+#course-years {
+	flex-direction: column;
+	justify-content: flex-start;
+	margin-top: 0.85rem;
+}
+
+#course-years li button {
+	display: flex;
+	justify-content: flex-start;
+	text-align: left;
+	border: none;
+	border-left: 3px solid transparent;
+	border-radius: 0;
+	background: transparent;
+	color: var(--ink);
+}
+
+#course-years li button:hover,
+#course-years li button.selected {
+	background: transparent;
+	color: var(--ink);
+	border-left-color: var(--ece-20);
+}
+
+#courses-grid {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	margin: 0;
+}
+
+.course-item {
+	display: grid;
+	grid-template-columns: 5.5rem 7.25rem minmax(0, 1fr) auto;
+	background: none;
+	border-radius: 0;
+	border-bottom: 1px solid hsl(202, 12%, 86%);
+	padding: 0.7rem 0;
+	align-items: center;
+	gap: 0.35rem 0.85rem;
+}
+
+.course-item .year-badge {
+	grid-column: 1;
+	grid-row: 1;
+	background: none;
+	color: var(--ece-20);
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.72rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	padding: 0;
+	border-radius: 0;
+}
+
+.course-item.year-200 .year-badge,
+.course-item.year-300 .year-badge,
+.course-item.year-400 .year-badge {
+	background: none;
+	color: var(--ece-20);
+}
+
+.course-item h2 {
+	grid-column: 2;
+	grid-row: 1;
+	margin: 0;
+	font-size: 1rem;
+	white-space: nowrap;
+}
+
+.course-item h3 {
+	grid-column: 3;
+	grid-row: 1;
+	align-self: center;
+	margin: 0;
+}
+
+.course-item .button.link,
+.course-item details.course-resources {
+	grid-column: 4;
+	grid-row: 1;
+	margin-top: 0;
+	width: auto;
+}
+
+.courses-note {
+	width: var(--measure);
+	max-width: 100%;
+	box-sizing: border-box;
+	text-align: left;
+	margin: 1.25rem auto 2rem;
+	font-size: var(--label-size);
+}
+
+@media (max-width: 800px) {
+	#courses-page #content {
+		width: 100vw;
+		max-width: 100vw;
+		min-width: 0;
+		align-items: stretch;
+	}
+
+	#courses-layout {
+		grid-template-columns: 1fr;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+		padding: 0 0.85rem;
+		box-sizing: border-box;
+	}
+
+	#courses-rail {
+		position: static;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+	}
+
+	#course-years {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 0;
+		width: 100%;
+		max-width: 100%;
+		min-width: 0;
+	}
+
+	#course-years li {
+		min-width: 0;
+		width: auto;
+		max-width: 100%;
+	}
+
+	#course-years li button {
+		justify-content: center;
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+		padding: 0.4rem 0.05rem;
+		font-size: 0.7rem;
+		white-space: nowrap;
+		letter-spacing: 0;
+		overflow: hidden;
+	}
+
+	.course-item {
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			"year link"
+			"code link"
+			"name link";
+	}
+
+	.course-item .year-badge {
+		grid-area: year;
+	}
+
+	.course-item h2 {
+		grid-area: code;
+	}
+
+	.course-item h3 {
+		grid-area: name;
+	}
+
+	.course-item .button.link,
+	.course-item details.course-resources {
+		grid-area: link;
+	}
 }

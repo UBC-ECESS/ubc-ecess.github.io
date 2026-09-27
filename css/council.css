@@ -1,81 +1,190 @@
-/* COUNCIL */
-
-#council-grid {
-	display: grid;
-	width: var(--grid-width);
-	grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
-	grid-template-rows: auto;
-	column-gap: var(--grid-col-gap);
-	row-gap: var(--grid-row-gap);
-	margin-top: var(--grid-margin-top);
-	padding: 0;
-	list-style: none;
+#council-page #content {
+	align-items: stretch;
 }
 
-.council-member {
+#hiring,
+#council-page #contact {
+	width: min(100% - 2rem, var(--measure));
+	margin: 0.75rem auto 0;
+}
+
+#council-page #contact {
+	padding: 1.15rem 1.35rem 1.25rem;
+	background: hsl(202, 38%, 96%);
+	border: 1px solid hsl(202, 28%, 80%);
+	box-sizing: border-box;
+}
+
+#council-page #contact h2,
+#hiring h2 {
+	margin: 0 0 0.4rem;
+	font-size: var(--subhead);
 	text-align: left;
 }
 
-.council-member img {
-	border-radius: var(--border-radius);
-	object-fit: cover;
-	width: 100%;
-	aspect-ratio: 1 / 1;
+#council-page .contact-intro {
+	margin-bottom: 0.85rem;
 }
 
-.council-member>i {
-	background-color: var(--secondary);
-	color: var(--background);
-	font-size: calc(var(--grid-col-width) * 0.6);
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	border-radius: var(--border-radius);
+#council-page .form-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem 1.25rem;
+}
+
+#council-page .form-wide {
+	grid-column: 1 / -1;
+}
+
+@media (max-width: 800px) {
+	#council-page .form-container {
+		grid-template-columns: 1fr;
+	}
+}
+
+#hiring > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 1.25rem;
+}
+
+.roles {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.75rem;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.roles:not(:has(:first-child)) {
+	display: none;
+}
+
+.roles li:not(:has(.empty-note)) {
+	display: flex;
+	align-items: center;
+	border-left: 3px solid var(--ece-20);
+	padding: 0.35rem 0.7rem;
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.92rem;
+}
+
+.roles li > i {
+	color: var(--ece-20);
+	margin-left: 0.45rem;
+}
+
+.empty-note {
+	padding: 0.6rem 0;
+}
+
+#people {
+	width: min(100% - 2rem, var(--measure));
+	margin: 1.75rem auto 2.5rem;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	gap: 2.75rem;
+	align-self: stretch;
 }
 
-.council-member h2 {
-	/* name */
-	font-size: var(--h4-size);
-	margin: var(--item-name-margin);
+.council-year > h2 {
+	margin: 0 0 1rem;
+	font-size: var(--subhead);
+	text-align: left;
 }
 
-.council-member h3 {
-	/* position */
-	font-size: var(--h5-size);
-	font-weight: 400;
+.council-year > h2::after {
+	content: "";
+	display: block;
+	width: 2.25rem;
+	height: 2px;
+	margin-top: 0.45rem;
+	background: var(--ece-20);
+}
+
+.council-year > ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	gap: 1.75rem 1.25rem;
+	list-style: none;
+	padding: 0;
 	margin: 0;
 }
 
-.council-member h3>span {
+.council-member {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.35rem;
+	padding: 0;
+	border: none;
+}
+
+.council-member img,
+.council-member > i {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	object-position: center 15%;
+	border-radius: 0;
+	font-size: 3rem;
+}
+
+.council-member h2,
+.council-member h3 {
+	margin: 0;
+	width: 100%;
+}
+
+.council-member h3 {
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.council-member .role {
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 0.35rem;
+	width: 100%;
+}
+
+.council-member .role-name {
+	min-width: 0;
 	white-space: nowrap;
 }
 
-.council-member h3 i {
-	margin-left: var(--icon-margin);
-	font-size: var(--body-size);
-	color: var(--primary-20);
+.council-member .role i {
+	flex: none;
+	line-height: 1;
+}
+
+.council-member h2 {
+	font-size: 1.05rem;
 }
 
 .council-member ul {
-	margin: 1rem 0 0 0;
+	list-style: none;
 	padding: 0;
-	list-style-type: none;
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	gap: var(--gap-width);
-	flex-wrap: wrap;
-}
-
-.council-member li:has(> a) {
-	background: none;
-	padding: 0;
-	display: flex;
+	margin: 0.1rem 0 0;
 }
 
 .council-member .button.link {
-	padding: var(--thin-padding);
+	border: none;
+	background: none;
+	padding: 0;
+	border-radius: 0;
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-size: 0.78rem;
+	text-decoration: underline;
+	text-underline-offset: 0.18em;
+}
+
+.council-member .button.link:hover {
+	background: none;
+	color: var(--ink);
 }
