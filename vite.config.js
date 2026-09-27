@@ -1,3 +1,4 @@
+import { cpSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 
@@ -66,6 +67,11 @@ export default defineConfig({
             item.source = item.source.replace(/(href|src)="\.\.\//g, '$1="/');
           }
         }
+      },
+      closeBundle() {
+        cpSync("CNAME", "dist/CNAME");
+        cpSync("media", "dist/media", { recursive: true });
+        cpSync("favicon", "dist/favicon", { recursive: true });
       },
     },
   ],
