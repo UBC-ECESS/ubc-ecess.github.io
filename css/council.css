@@ -83,10 +83,13 @@
 #people {
 	width: min(100% - 2rem, var(--measure));
 	margin: 1.75rem auto 2.5rem;
+	padding: 0;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	gap: 2.75rem;
 	align-self: stretch;
+	list-style: none;
 }
 
 .council-year > h2 {
@@ -106,7 +109,7 @@
 
 .council-year > ul {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
 	gap: 1.75rem 1.25rem;
 	list-style: none;
 	padding: 0;
@@ -120,11 +123,14 @@
 	gap: 0.35rem;
 	padding: 0;
 	border: none;
+	min-width: 0;
+	max-width: 100%;
 }
 
 .council-member img,
 .council-member > i {
 	width: 100%;
+	max-width: 100%;
 	height: auto;
 	aspect-ratio: 3 / 4;
 	object-fit: cover;
