@@ -165,6 +165,7 @@ body {
 	background-size: 64px 64px;
 	margin: 0;
 	min-height: 100vh;
+	padding-bottom: 2.75rem;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	overscroll-behavior: none;
@@ -173,6 +174,12 @@ body {
 	justify-content: flex-start;
 	align-items: center;
 	position: relative;
+}
+
+@media (max-width: 720px) {
+	body {
+		padding-bottom: 4.75rem;
+	}
 }
 
 h1 {
@@ -750,9 +757,13 @@ header nav .button.nav.current::after {
 }
 
 #site-footer {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 40;
 	width: 100%;
 	box-sizing: border-box;
-	margin-top: auto;
 	background: hsl(202, 30%, 97%);
 	color: var(--ink);
 	border-top: 1px solid hsl(202, 25%, 82%);
