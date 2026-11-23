@@ -264,8 +264,8 @@
 
 @media (max-width: 800px) {
 	#courses-page #content {
-		width: 100vw;
-		max-width: 100vw;
+		width: 100%;
+		max-width: 100%;
 		min-width: 0;
 		align-items: stretch;
 	}

@@ -80,9 +80,8 @@ export function listUpcoming(num) {
     }
     html += "</div>";
 
+    html += `<span class="event-date">${writtenDate(field(rows("events")[currEvent], "date"))}</span>`;
     html += `<h2>${field(rows("events")[currEvent], "name")}</h2>`;
-    html += '<ul class="event-when">';
-    html += `<li class="event-date">${writtenDate(field(rows("events")[currEvent], "date"))}</li>`;
     let eventTime =
       field(rows("events")[currEvent], "start", true) == null
         ? "TBD"
@@ -94,8 +93,7 @@ export function listUpcoming(num) {
       field(rows("events")[currEvent], "location") != null
         ? field(rows("events")[currEvent], "location")
         : "TBD";
-    html += `<li class="event-meta">${eventTime} · ${eventPlace}</li>`;
-    html += "</ul>";
+    html += `<p class="event-meta">${eventTime} · ${eventPlace}</p>`;
     if (present(rows("events")[currEvent], ["contacts", "rsvp", "calendar"])) {
       html += '<ul class="event-actions">';
 

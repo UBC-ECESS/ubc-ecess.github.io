@@ -16,7 +16,7 @@ import {
   boot,
   CONFIG,
 } from "../app.js?version=8";
-import { listUpcoming } from "./events.js?version=10";
+import { listUpcoming } from "./events.js?version=11";
 function buildShortcuts() {
   let html = "";
   let linkIdx = 0;
