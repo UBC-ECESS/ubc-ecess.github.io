@@ -792,6 +792,16 @@ header nav .button.nav.current::after {
 	background: none;
 }
 
+@media (max-height: 740px) {
+	body {
+		padding-bottom: 0;
+	}
+
+	#site-footer {
+		position: static;
+	}
+}
+
 @media (min-width: 601px) {
 	:has(>.tooltip) {
 		position: relative;
